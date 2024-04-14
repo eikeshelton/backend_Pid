@@ -1,7 +1,7 @@
 # controllers/usuario_controller.py
 
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
+from fastapi import HTTPException,Depends
 from models.usuario import Usuario
 from dependencies import get_db
 
@@ -33,4 +33,14 @@ def atualizar_usuario(db: Session, email: str, usuario_update: Usuario):
         return db_usuario
     else:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+def obter_dados_usuario(email: str, db: Session = Depends(get_db)):
+    # Buscar o usuário com o login fornecido
+    usuario = db.query(Usuario).filter(Usuario.email == email).first()
     
+    # Verificar se o usuário existe
+    if usuario is None:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    # Retornar os dados do usuário
+    return usuario

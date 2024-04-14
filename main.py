@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario, login_usuario,atualizar_usuario
+from controllers.usuario_controller import criar_usuario, login_usuario,atualizar_usuario,obter_dados_usuario
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -30,6 +30,14 @@ class UsuarioUpdate(BaseModel):
     bio: Optional[str] = None
     tipo_usuario: Optional[str] = None
 # Rota para criar um novo usuário
+class UsuarioSelect(BaseModel):
+    nome_usuario: str
+    tipo_usuario: str
+    foto_perfil: bytes
+    bio: str
+    seguidores:int
+    seguidos:int
+
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
@@ -37,9 +45,15 @@ def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_
 # Rota para login de usuário
 @app.post("/login/")
 def fazer_login(login_data: Login, db: Session = Depends(get_db)):
-    usuario = login_usuario(db, login_data.login, login_data.senha)
+    
     return login_usuario(db, login_data.login, login_data.senha)
 
 @app.put("/usuarios/{email}")
 def atualizar_dados_usuario(email: str, usuario_update: UsuarioUpdate, db: Session = Depends(get_db)):
     return atualizar_usuario(db, email, usuario_update)
+
+@app.get("/usuarios/{email}")
+def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
+
+    usuario = obter_dados_usuario(email, db)
+    return usuario

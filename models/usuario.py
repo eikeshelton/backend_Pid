@@ -1,6 +1,6 @@
 # models/usuario.py
 
-from sqlalchemy import Column, String, Date, BINARY
+from sqlalchemy import Column, String, Date, BINARY,INTEGER
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -16,3 +16,5 @@ class Usuario(Base):
     data_nascimento = Column(Date)
     foto_perfil = Column(BINARY)
     bio = Column(String)
+    seguidores = Column(INTEGER, default=0)
+    seguidos = Column(INTEGER, default=0)
