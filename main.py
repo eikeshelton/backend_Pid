@@ -1,8 +1,8 @@
 # app.py
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends,HTTPException
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario, login_usuario,atualizar_usuario,obter_dados_usuario
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais, login_usuario,atualizar_usuario,obter_dados_usuario
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -37,7 +37,13 @@ class UsuarioSelect(BaseModel):
     bio: str
     seguidores:int
     seguidos:int
-
+class LoginUpdate(BaseModel):
+    login: str
+    senha: str
+    email: str
+class Credenciais(BaseModel):
+    email: str
+    senha: str
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
@@ -45,15 +51,33 @@ def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_
 # Rota para login de usuário
 @app.post("/login/")
 def fazer_login(login_data: Login, db: Session = Depends(get_db)):
-    
     return login_usuario(db, login_data.login, login_data.senha)
 
+
+
+# Rota para atualizar as informações do perfil
 @app.put("/usuarios/{email}")
 def atualizar_dados_usuario(email: str, usuario_update: UsuarioUpdate, db: Session = Depends(get_db)):
     return atualizar_usuario(db, email, usuario_update)
 
+
+
+# Rota para atualizar o usuario
 @app.get("/usuarios/{email}")
 def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
 
     usuario = obter_dados_usuario(email, db)
     return usuario
+
+
+# Rota para verificar a senha
+@app.post("/check-credentials/")
+def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depends(get_db)):
+    # Chama a função verificar_email_senha do controlador
+    validas = verificar_credenciais(db, credenciais.email, credenciais.senha)
+    
+    # Retorna uma resposta indicando se as credenciais são válidas
+    if not validas:
+        raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
+
+    return True
