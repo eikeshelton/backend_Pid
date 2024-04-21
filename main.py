@@ -41,6 +41,7 @@ class LoginUpdate(BaseModel):
     login: str
     senha: str
     email: str
+    id:int
 class Credenciais(BaseModel):
     email: str
     senha: str
@@ -70,14 +71,22 @@ def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
     return usuario
 
 
-# Rota para verificar a senha
 @app.post("/check-credentials/")
 def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depends(get_db)):
+    
+    # Chama a função verificar_credenciais para obter o ID do usuário
+    usuario = verificar_credenciais(db, credenciais.email, credenciais.senha)
+        
+    # Retorna o ID do usuário
+    return usuario
+    
+@app.put("/Uploadlogin/")
+def upload_login_endpoint(LoginUpdate: LoginUpdate, db: Session = Depends(get_db)):
     # Chama a função verificar_email_senha do controlador
-    validas = verificar_credenciais(db, credenciais.email, credenciais.senha)
+    usuario = upload_login(db, LoginUpdate.login, LoginUpdate.senha, LoginUpdate.email, LoginUpdate.id)
     
     # Retorna uma resposta indicando se as credenciais são válidas
-    if not validas:
-        raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
+    if not usuario:
+        raise HTTPException(status_code=401, detail="não cadastrado")
 
-    return True
+    return usuario

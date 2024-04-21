@@ -67,31 +67,40 @@ def obter_dados_usuario(email: str, db: Session = Depends(get_db)):
 
 
 def verificar_credenciais(db: Session, email: str, senha: str):
+    # Procura o usuário pelo email
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
 
     if usuario is None:
+        # Se o usuário não for encontrado, levanta uma exceção HTTP 404
         raise HTTPException(status_code=404, detail="Email fornecido incorreto")
     
+    # Verifica se a senha fornecida corresponde à senha armazenada no banco de dados
     if not bcrypt.checkpw(senha.encode('utf-8'), usuario.senha.encode('utf-8')):
+        # Se a senha estiver incorreta, levanta uma exceção HTTP 401
         raise HTTPException(status_code=401, detail="Senha incorreta")
-    
-    return True
-def upload_login(db: Session, email: str, senha_atual: str, login_update: str, senha_update: str, email_update: str):
-    # Busca o usuário no banco de dados pelo e-mail fornecido
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+
+    # Se as credenciais estiverem corretas, retorna o ID do usuário
+    return usuario
+
+def upload_login(db: Session,login_update: Usuario, senha_update: Usuario.senha, email_update: Usuario.email,id:Usuario.id):
+    # Busca o usuário no banco de dados pelo id atual fornecido
+    usuario = db.query(Usuario).filter(Usuario.id == id).first()
     
     # Verifica se o usuário foi encontrado
     if usuario is None:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
-    # Verifica se a senha atual fornecida corresponde à senha armazenada
-    if not bcrypt.checkpw(senha_atual.encode('utf-8'), usuario.senha.encode('utf-8')):
-        raise HTTPException(status_code=401, detail="Senha atual incorreta")
+    # Atualiza o login se fornecido
+    if login_update is not None:
+        usuario.login = login_update
     
-    # Atualiza o login, senha e e-mail do usuário se a senha atual for válida
-    usuario.login = login_update
-    usuario.senha = bcrypt.hashpw(senha_update.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    usuario.email = email_update
+    # Atualiza a senha se fornecida
+    if senha_update is not None:
+        usuario.senha = bcrypt.hashpw(senha_update.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    # Atualiza o e-mail se fornecido
+    if email_update is not None:
+        usuario.email = email_update
     
     # Salva as alterações no banco de dados
     db.commit()
@@ -99,4 +108,5 @@ def upload_login(db: Session, email: str, senha_atual: str, login_update: str, s
     
     # Retorna o usuário atualizado
     return usuario
+
 
