@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException,Depends
 from models.usuario import Usuario
 from dependencies import get_db
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 def criar_usuario(db: Session, usuario_create):
@@ -116,6 +119,9 @@ def adicionar_token_reset_senha(db: Session, email: str):
         token = secrets.token_urlsafe(32)
         usuario.token_reset_senha = token
         db.commit()
+
+        # Enviar e-mail
+        enviar_email(usuario.email, token)
         return token
     else:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
@@ -152,4 +158,40 @@ def alterar_senha(db: Session, email: str, nova_senha: str):
         return usuario
     else:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+def enviar_email(destinatario: str, token: str):
+    remetente = "weactivebsb@gmail.com"  # Insira seu endereço de e-mail
+    senha = "Fitness123"  # Insira sua senha
+
+    # Configurar mensagem
+    msg = MIMEMultipart()
+    msg['From'] = remetente
+    msg['To'] = destinatario
+    msg['Subject'] = "Redefinição de Senha"
+
+    corpo_email = f"""
+    Olá,
+
+    Você solicitou uma redefinição de senha. Use o seguinte token para redefinir sua senha:
+
+    Token: {token}
+
+    Se você não solicitou esta alteração, ignore este e-mail.
+
+    Atenciosamente,
+    WeActive
+    """
+
+    msg.attach(MIMEText(corpo_email, 'plain'))
+
+    # Conectar ao servidor SMTP
+    servidor_smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    servidor_smtp.starttls()
+    servidor_smtp.login(remetente, senha)
+
+    # Enviar e-mail
+    servidor_smtp.sendmail(remetente, destinatario, msg.as_string())
+
+    # Desconectar do servidor SMTP
+    servidor_smtp.quit()
 
