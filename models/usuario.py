@@ -18,3 +18,4 @@ class Usuario(Base):
     bio = Column(String)
     seguidores = Column(INTEGER, default=0)
     seguidos = Column(INTEGER, default=0)
+    token_reset_senha = Column(String)

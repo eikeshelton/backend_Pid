@@ -45,6 +45,10 @@ class LoginUpdate(BaseModel):
 class Credenciais(BaseModel):
     email: str
     senha: str
+class UserResetPassword(BaseModel):
+    email: str
+    token: Optional[str]=None
+    new_password:Optional[str]=None
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
@@ -92,24 +96,23 @@ def upload_login_endpoint(LoginUpdate: LoginUpdate, db: Session = Depends(get_db
     return usuario
 
 # Rota para solicitar redefinição de senha
-@app.post("/usuarios/{email}/request-password-reset/")
-def request_password_reset(email: str, db: Session = Depends(get_db)):
-    token = adicionar_token_reset_senha(db, email)
+@app.post("/usuarios/request-password-reset/")
+def request_password_reset(UserResetPassword: UserResetPassword, db: Session = Depends(get_db)):
+    token = adicionar_token_reset_senha(db, UserResetPassword.email)
     if token:
-        # Aqui você pode enviar o token por email
         return {"message": "Token de redefinição de senha enviado por email."}
     else:
         raise HTTPException(status_code=404, detail="Email não encontrado")
 
 # Rota para redefinir senha
-@app.post("/usuarios/{email}/reset-password/")
-def reset_password(email: str, token: str, new_password: str, db: Session = Depends(get_db)):
-    token_db = obter_token_reset_senha(db, email)
-    if token_db == token:
+@app.post("/usuarios/reset-password/")
+def reset_password(UserResetPassword:UserResetPassword, db: Session = Depends(get_db)):
+    token_db = obter_token_reset_senha(db, UserResetPassword.email)
+    if token_db == UserResetPassword.token:
         # Aqui você precisa definir a nova senha para o usuário
-        alterar_senha(db, email, new_password)
+        alterar_senha(db, UserResetPassword.email, UserResetPassword.new_password)
         # e limpar o token de redefinição de senha
-        limpar_token_reset_senha(db, email)
+        limpar_token_reset_senha(db, UserResetPassword.email)
         return {"message": "Senha redefinida com sucesso."}
     else:
         raise HTTPException(status_code=400, detail="Token inválido")
