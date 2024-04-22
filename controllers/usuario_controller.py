@@ -160,7 +160,7 @@ def alterar_senha(db: Session, email: str, nova_senha: str):
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
 def enviar_email(destinatario: str, token: str):
-    remetente = "weactivebsb@gmail.com"  # Insira seu endereço de e-mail
+    remetente = "weactivebsb@outlook.com"  # Insira seu endereço de e-mail
     senha = "Fitness123"  # Insira sua senha
 
     # Configurar mensagem
@@ -185,7 +185,7 @@ def enviar_email(destinatario: str, token: str):
     msg.attach(MIMEText(corpo_email, 'plain'))
 
     # Conectar ao servidor SMTP
-    servidor_smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    servidor_smtp = smtplib.SMTP('smtp-mail.outlook.com', 587)
     servidor_smtp.starttls()
     servidor_smtp.login(remetente, senha)
 
