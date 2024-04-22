@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Depends,HTTPException
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais, login_usuario,atualizar_usuario,obter_dados_usuario
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais, login_usuario,atualizar_usuario,obter_dados_usuario, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -90,3 +90,26 @@ def upload_login_endpoint(LoginUpdate: LoginUpdate, db: Session = Depends(get_db
         raise HTTPException(status_code=401, detail="não cadastrado")
 
     return usuario
+
+# Rota para solicitar redefinição de senha
+@app.post("/usuarios/{email}/request-password-reset/")
+def request_password_reset(email: str, db: Session = Depends(get_db)):
+    token = adicionar_token_reset_senha(db, email)
+    if token:
+        # Aqui você pode enviar o token por email
+        return {"message": "Token de redefinição de senha enviado por email."}
+    else:
+        raise HTTPException(status_code=404, detail="Email não encontrado")
+
+# Rota para redefinir senha
+@app.post("/usuarios/{email}/reset-password/")
+def reset_password(email: str, token: str, new_password: str, db: Session = Depends(get_db)):
+    token_db = obter_token_reset_senha(db, email)
+    if token_db == token:
+        # Aqui você precisa definir a nova senha para o usuário
+        alterar_senha(db, email, new_password)
+        # e limpar o token de redefinição de senha
+        limpar_token_reset_senha(db, email)
+        return {"message": "Senha redefinida com sucesso."}
+    else:
+        raise HTTPException(status_code=400, detail="Token inválido")

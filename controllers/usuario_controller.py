@@ -1,5 +1,6 @@
 # controllers/usuario_controller.py
 import bcrypt
+import secrets
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,Depends
 from models.usuario import Usuario
@@ -109,4 +110,46 @@ def upload_login(db: Session,login_update: Usuario, senha_update: Usuario.senha,
     # Retorna o usuário atualizado
     return usuario
 
+def adicionar_token_reset_senha(db: Session, email: str):
+    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    if usuario:
+        token = secrets.token_urlsafe(32)
+        usuario.token_reset_senha = token
+        db.commit()
+        return token
+    else:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+def obter_token_reset_senha(db: Session, email: str):
+    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    if usuario:
+        return usuario.token_reset_senha
+    else:
+        return None
+
+def limpar_token_reset_senha(db: Session, email: str):
+    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    if usuario:
+        usuario.token_reset_senha = None
+        db.commit()
+        return True
+    else:
+        return False
+    
+def alterar_senha(db: Session, email: str, nova_senha: str):
+    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    if usuario:
+        # Hash da nova senha
+        nova_senha_hashed = bcrypt.hashpw(nova_senha.encode('utf-8'), bcrypt.gensalt())
+        
+        # Atualiza a senha do usuário
+        usuario.senha = nova_senha_hashed.decode("utf-8")
+        
+        # Commit e refresh no banco de dados
+        db.commit()
+        db.refresh(usuario)
+        
+        return usuario
+    else:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
