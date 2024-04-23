@@ -46,8 +46,8 @@ def login_usuario(db: Session, login: str, senha: str):
 
 
 
-def atualizar_usuario(db: Session, usuario_update: Usuario):
-    db_usuario = db.query(Usuario).filter(Usuario.email == usuario_update.email).first()
+def atualizar_usuario(db: Session, email: str, usuario_update: Usuario):
+    db_usuario = db.query(Usuario).filter(Usuario.email == email).first()
     if db_usuario:
         # Atualizar os campos do usuário com base nos dados fornecidos
         for key, value in usuario_update.dict(exclude_unset=True).items():
