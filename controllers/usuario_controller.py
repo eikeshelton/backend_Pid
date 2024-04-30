@@ -1,10 +1,13 @@
 # controllers/usuario_controller.py
 import bcrypt
+import secrets
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,Depends
 from models.usuario import Usuario
 from dependencies import get_db
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 def criar_usuario(db: Session, usuario_create):
 
