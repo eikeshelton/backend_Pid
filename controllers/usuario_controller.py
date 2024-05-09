@@ -195,3 +195,11 @@ def enviar_email(destinatario: str, token: str):
     # Desconectar do servidor SMTP
     servidor_smtp.quit()
 
+def buscar_usuarios_por_nome(db: Session, nome: str, limite: int = 5) -> List[Usuario]:
+    return db.query(Usuario).filter(Usuario.nome.ilike(f'%{nome}%')).order_by(Usuario.nome).limit(limite).all()
+
+def registrar_pesquisa(db: Session, texto_pesquisa: str):
+    nova_pesquisa = HistoricoPesquisa(usuario_id=usuario_id, texto_pesquisa=texto_pesquisa)
+    db.add(nova_pesquisa)
+    db.commit()
+    db.refresh(nova_pesquisa)

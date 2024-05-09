@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Depends,HTTPException
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais, login_usuario,atualizar_usuario,obter_dados_usuario, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha, buscar_usuarios_por_nome, registrar_pesquisa
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -116,3 +116,19 @@ def reset_password(UserResetPassword:UserResetPassword, db: Session = Depends(ge
         return {"message": "Senha redefinida com sucesso."}
     else:
         raise HTTPException(status_code=400, detail="Token inválido")
+
+# Rota para buscar usuários por parte do nome e ordenar alfabeticamente
+@app.get("/usuarios/buscar/")
+def buscar_usuarios(login: str, db: Session = Depends(get_db)):
+    usuarios = buscar_usuarios_por_nome(db, login)
+    return usuarios
+
+@app.get("/usuarios/registra-buscar/")
+def buscar_usuarios(login: str, db: Session = Depends(get_db)):
+    usuarios = buscar_usuarios_por_nome(db, login)
+    
+    # Registra a pesquisa apenas se houver usuários retornados
+    if usuarios:
+        registrar_pesquisa(db, login)
+    
+    return usuarios

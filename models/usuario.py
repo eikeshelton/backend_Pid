@@ -1,6 +1,7 @@
 # models/usuario.py
 
 from sqlalchemy import Column, String, Date, BINARY,INTEGER
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -19,3 +20,5 @@ class Usuario(Base):
     seguidores = Column(INTEGER, default=0)
     seguidos = Column(INTEGER, default=0)
     token_reset_senha = Column(String)
+
+    pesquisas = relationship("HistoricoPesquisa", back_populates="usuario")
