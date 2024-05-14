@@ -49,6 +49,10 @@ class UserResetPassword(BaseModel):
     email: str
     token: Optional[str]=None
     new_password:Optional[str]=None
+class UserSearch(BaseModel):
+    login:str
+
+
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
@@ -118,12 +122,12 @@ def reset_password(UserResetPassword:UserResetPassword, db: Session = Depends(ge
         raise HTTPException(status_code=400, detail="Token inválido")
 
 # Rota para buscar usuários por parte do nome e ordenar alfabeticamente
-@app.get("/usuarios/buscar/")
-def buscar_usuarios(login: str, db: Session = Depends(get_db)):
-    usuarios = buscar_usuarios_por_nome(db, login)
+@app.post("/usuarios/buscar/")
+def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
+    usuarios = buscar_usuarios_por_nome(db, usersearch.login)
     return usuarios
 
-@app.get("/usuarios/registra-buscar/")
+@app.post("/usuarios/registra-buscar/")
 def buscar_usuarios(login: str, db: Session = Depends(get_db)):
     usuarios = buscar_usuarios_por_nome(db, login)
     

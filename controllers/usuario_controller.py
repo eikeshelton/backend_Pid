@@ -3,8 +3,7 @@ import bcrypt
 import secrets
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,Depends
-from models.usuario import Usuario
-from models.historico_pesquisa import HistoricoPesquisa
+from models.models import Usuario,HistoricoPesquisa
 from dependencies import get_db
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -196,8 +195,9 @@ def enviar_email(destinatario: str, token: str):
     # Desconectar do servidor SMTP
     servidor_smtp.quit()
 
-def buscar_usuarios_por_nome(db: Session, nome: str, limite: int = 5) -> list[Usuario]:
-    return db.query(Usuario).filter(Usuario.nome.ilike(f'%{nome}%')).order_by(Usuario.nome).limit(limite).all()
+def buscar_usuarios_por_nome(db: Session, login: str, limite: int = 5) -> list[Usuario]:
+     usuarios= db.query(Usuario).filter(Usuario.login.ilike(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
+     return usuarios
 
 def registrar_pesquisa(db: Session, texto_pesquisa: str):
     nova_pesquisa = HistoricoPesquisa(usuario_id = Usuario.id, texto_pesquisa=texto_pesquisa)
