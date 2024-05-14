@@ -49,6 +49,8 @@ class UserResetPassword(BaseModel):
     email: str
     token: Optional[str]=None
     new_password:Optional[str]=None
+
+    
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
