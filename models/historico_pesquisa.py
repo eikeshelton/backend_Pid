@@ -9,7 +9,7 @@ class HistoricoPesquisa(Base):
     __tablename__ = 'historico_pesquisa'
 
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
+    usuario_id = Column(Integer, ForeignKey('usuario.id'))
     texto_pesquisa = Column(String, index=True)
     data_pesquisa = Column(DateTime, default=datetime.now)
 

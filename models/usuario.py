@@ -2,6 +2,7 @@
 
 from sqlalchemy import Column, String, Date, BINARY,INTEGER
 from sqlalchemy.orm import relationship
+from models.historico_pesquisa import HistoricoPesquisa
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
