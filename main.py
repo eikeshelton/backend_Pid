@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Depends,HTTPException
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais, login_usuario,atualizar_usuario,obter_dados_usuario
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -45,6 +45,14 @@ class LoginUpdate(BaseModel):
 class Credenciais(BaseModel):
     email: str
     senha: str
+class UserResetPassword(BaseModel):
+    email: str
+    token: Optional[str]=None
+    new_password:Optional[str]=None
+class UserSearch(BaseModel):
+    login:str
+
+
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
@@ -90,3 +98,41 @@ def upload_login_endpoint(LoginUpdate: LoginUpdate, db: Session = Depends(get_db
         raise HTTPException(status_code=401, detail="não cadastrado")
 
     return usuario
+
+# Rota para solicitar redefinição de senha
+@app.post("/usuarios/request-password-reset/")
+def request_password_reset(UserResetPassword: UserResetPassword, db: Session = Depends(get_db)):
+    token = adicionar_token_reset_senha(db, UserResetPassword.email)
+    if token:
+        return {"message": "Token de redefinição de senha enviado por email."}
+    else:
+        raise HTTPException(status_code=404, detail="Email não encontrado")
+
+# Rota para redefinir senha
+@app.post("/usuarios/reset-password/")
+def reset_password(UserResetPassword:UserResetPassword, db: Session = Depends(get_db)):
+    token_db = obter_token_reset_senha(db, UserResetPassword.email)
+    if token_db == UserResetPassword.token:
+        # Aqui você precisa definir a nova senha para o usuário
+        alterar_senha(db, UserResetPassword.email, UserResetPassword.new_password)
+        # e limpar o token de redefinição de senha
+        limpar_token_reset_senha(db, UserResetPassword.email)
+        return {"message": "Senha redefinida com sucesso."}
+    else:
+        raise HTTPException(status_code=400, detail="Token inválido")
+
+# Rota para buscar usuários por parte do nome e ordenar alfabeticamente
+@app.post("/usuarios/buscar/")
+def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
+    usuarios = buscar_usuarios_por_nome(db, usersearch.login)
+    return usuarios
+
+@app.post("/usuarios/registra-buscar/")
+def buscar_usuarios(login: str, db: Session = Depends(get_db)):
+    usuarios = buscar_usuarios_por_nome(db, login)
+    
+    # Registra a pesquisa apenas se houver usuários retornados
+    if usuarios:
+        registrar_pesquisa(db, login)
+    
+    return usuarios
