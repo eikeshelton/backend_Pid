@@ -160,8 +160,8 @@ def alterar_senha(db: Session, email: str, nova_senha: str):
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
 def enviar_email(destinatario: str, token: str):
-    remetente = "eike_shelton_@hotmail.com"  # Insira seu endereço de e-mail
-    senha = "99172540eike"  # Insira sua senha
+    remetente = ""  # Insira seu endereço de e-mail
+    senha = ""  # Insira sua senha
 
     # Configurar mensagem
     msg = MIMEMultipart()
