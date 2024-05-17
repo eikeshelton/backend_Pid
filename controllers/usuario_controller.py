@@ -3,7 +3,8 @@ import bcrypt
 import secrets
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,Depends
-from models.models import Usuario,HistoricoPesquisa
+from models.usuario import Usuario
+from models.historico import HistoricoPesquisa
 from dependencies import get_db
 import smtplib
 from email.mime.multipart import MIMEMultipart
