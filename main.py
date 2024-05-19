@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Depends,HTTPException
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -51,7 +51,9 @@ class UserResetPassword(BaseModel):
     new_password:Optional[str]=None
 class UserSearch(BaseModel):
     login:str
-
+class Registrar_Busca(BaseModel):
+    usuario_id:int
+    pesquisado_id:int 
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -128,11 +130,11 @@ def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
     return usuarios
 
 @app.post("/usuarios/registra-buscar/")
-def buscar_usuarios(login: str, db: Session = Depends(get_db)):
-    usuarios = buscar_usuarios_por_nome(db, login)
+def buscar_usuarios(registrar_busca:Registrar_Busca,db: Session = Depends(get_db)):
+    historico =registrar_pesquisado(db, registrar_busca)
+    usuario = buscar_pesquisado(db, registrar_busca.pesquisado_id)
+    if usuario is None:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
-    # Registra a pesquisa apenas se houver usuários retornados
-    if usuarios:
-        registrar_pesquisa(db, login)
-    
-    return usuarios
+    return {"historico_pesquisa": historico, "usuario": usuario}  
+   

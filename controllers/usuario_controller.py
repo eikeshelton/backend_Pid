@@ -24,6 +24,7 @@ def criar_usuario(db: Session, usuario_create):
         senha=hashed_password.decode("utf-8"),
         tipo_usuario=usuario_create.tipo_usuario,
         data_nascimento=usuario_create.data_nascimento,
+        bio=usuario_create.bio,
         
     )
     db.add(db_usuario)
@@ -204,3 +205,11 @@ def registrar_pesquisa(db: Session, texto_pesquisa: str):
     db.add(nova_pesquisa)
     db.commit()
     db.refresh(nova_pesquisa)
+def registrar_pesquisado(db:Session,registrar_busca):
+    pesquisa =HistoricoPesquisa(usuario_id=registrar_busca.usuario_id, pesquisado_id=registrar_busca.pesquisado_id)
+    db.add(pesquisa)
+    db.commit()
+    db.refresh(pesquisa)
+    return pesquisa
+def buscar_pesquisado(db: Session, pesquisado_id: int):
+    return db.query(Usuario).filter(Usuario.id == pesquisado_id).first()
