@@ -1,10 +1,7 @@
 # models/usuario.py
-from sqlalchemy import Column, String, Date, BINARY, INTEGER,ForeignKey,DateTime
+from sqlalchemy import Column, String, Date, BINARY, INTEGER
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
-
-Base = declarative_base()
+from models.declarative_base import Base
 
 class Usuario(Base):
     __tablename__ = "usuario"
@@ -20,5 +17,6 @@ class Usuario(Base):
     seguidores = Column(INTEGER, default=0)
     seguidos = Column(INTEGER, default=0)
     token_reset_senha = Column(String)
-    pesquisas = relationship("HistoricoPesquisa", back_populates="usuario")
 
+    pesquisas = relationship("HistoricoPesquisa", back_populates="usuario", foreign_keys="[HistoricoPesquisa.usuario_id]")
+    pesquisas_pesquisado = relationship("HistoricoPesquisa", back_populates="pesquisado", foreign_keys="[HistoricoPesquisa.pesquisado_id]")
