@@ -18,5 +18,5 @@ class Usuario(Base):
     seguidos = Column(INTEGER, default=0)
     token_reset_senha = Column(String)
 
-    pesquisas = relationship("HistoricoPesquisa", back_populates="usuario", foreign_keys="[HistoricoPesquisa.usuario_id]")
-    pesquisas_pesquisado = relationship("HistoricoPesquisa", back_populates="pesquisado", foreign_keys="[HistoricoPesquisa.pesquisado_id]")
+    pesquisas = relationship("HistoricoPesquisa", back_populates="usuario", foreign_keys="HistoricoPesquisa.usuario_id")
+    pesquisas_pesquisado = relationship("HistoricoPesquisa", back_populates="pesquisado", foreign_keys="HistoricoPesquisa.pesquisado_id")
