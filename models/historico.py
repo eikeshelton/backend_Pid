@@ -1,7 +1,7 @@
 # models/historico.py
 from sqlalchemy import Column, INTEGER, ForeignKey
 from sqlalchemy.orm import relationship
-from models.declarative_base import Base
+from models.aadeclarative_base import Base
 
 class HistoricoPesquisa(Base):
     __tablename__ = 'historico_pesquisa'

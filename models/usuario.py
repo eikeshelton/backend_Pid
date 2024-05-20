@@ -1,7 +1,7 @@
 # models/usuario.py
 from sqlalchemy import Column, String, Date, BINARY, INTEGER
 from sqlalchemy.orm import relationship
-from models.declarative_base import Base
+from models.aadeclarative_base import Base
 
 class Usuario(Base):
     __tablename__ = "usuario"
