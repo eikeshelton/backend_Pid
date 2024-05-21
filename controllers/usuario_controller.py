@@ -9,6 +9,7 @@ from dependencies import get_db
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from datetime import datetime 
 
 def criar_usuario(db: Session, usuario_create):
 
@@ -207,12 +208,27 @@ def buscar_usuarios_por_nome(db: Session, login: str, limite: int = 5) -> list[d
 #    db.commit()
 #    db.refresh(nova_pesquisa)
 
-def registrar_pesquisado(db:Session,registrar_busca):
-    pesquisa =HistoricoPesquisa(usuario_id=registrar_busca.usuario_id, pesquisado_id=registrar_busca.pesquisado_id)
-    db.add(pesquisa)
-    db.commit()
-    db.refresh(pesquisa)
-    return pesquisa
+def registrar_pesquisado(db: Session, registrar_busca):
+    pesquisa_existente = db.query(HistoricoPesquisa).filter(
+        HistoricoPesquisa.usuario_id == registrar_busca.usuario_id,
+        HistoricoPesquisa.pesquisado_id == registrar_busca.pesquisado_id
+    ).first()
+
+    if pesquisa_existente:
+        pesquisa_existente.timestamp = datetime.utcnow()
+        db.commit()
+        db.refresh(pesquisa_existente)
+        return pesquisa_existente
+    else:
+        nova_pesquisa = HistoricoPesquisa(
+            usuario_id=registrar_busca.usuario_id, 
+            pesquisado_id=registrar_busca.pesquisado_id,
+            timestamp=datetime.utcnow()
+        )
+        db.add(nova_pesquisa)
+        db.commit()
+        db.refresh(nova_pesquisa)
+        return nova_pesquisa
 
 def buscar_pesquisado(db: Session, pesquisado_id: int):
     resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario).filter(Usuario.id == pesquisado_id).first()
