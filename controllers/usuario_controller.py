@@ -9,7 +9,7 @@ from dependencies import get_db
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from datetime import datetime 
+from datetime import datetime, timezone
 
 def criar_usuario(db: Session, usuario_create):
 
@@ -215,7 +215,7 @@ def registrar_pesquisado(db: Session, registrar_busca):
     ).first()
 
     if pesquisa_existente:
-        pesquisa_existente.timestamp = datetime.utcnow()
+        pesquisa_existente.timestamp = datetime.now(timezone.utc)
         db.commit()
         db.refresh(pesquisa_existente)
         return pesquisa_existente
@@ -223,7 +223,7 @@ def registrar_pesquisado(db: Session, registrar_busca):
         nova_pesquisa = HistoricoPesquisa(
             usuario_id=registrar_busca.usuario_id, 
             pesquisado_id=registrar_busca.pesquisado_id,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
         db.add(nova_pesquisa)
         db.commit()

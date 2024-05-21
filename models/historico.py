@@ -2,7 +2,7 @@
 from sqlalchemy import Column, INTEGER, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from models.aadeclarative_base import Base
-from datetime import datetime
+from datetime import datetime, timezone
 
 class HistoricoPesquisa(Base):
     __tablename__ = 'historico_pesquisa'
@@ -10,7 +10,7 @@ class HistoricoPesquisa(Base):
     id = Column(INTEGER, primary_key=True, index=True)
     usuario_id = Column(INTEGER, ForeignKey("usuario.id"))
     pesquisado_id = Column(INTEGER, ForeignKey("usuario.id"))
-    timestamp = Column(DateTime, server_default=datetime.now(), nullable=False)
+    timestamp = Column(DateTime, server_default=datetime.now(timezone.utc), nullable=False)
 
     usuario = relationship("Usuario", foreign_keys=[usuario_id], back_populates="pesquisas")
     pesquisado = relationship("Usuario", foreign_keys=[pesquisado_id], back_populates="pesquisas_pesquisado")
