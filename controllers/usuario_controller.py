@@ -197,20 +197,24 @@ def enviar_email(destinatario: str, token: str):
     servidor_smtp.quit()
 
 def buscar_usuarios_por_nome(db: Session, login: str, limite: int = 5) -> list[dict]:
-    resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario).filter(Usuario.login.ilike(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
+    resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario).filter(Usuario.login.startswith(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
     usuarios = [dict(zip(["id", "login", "tipo_usuario", "foto_perfil", "nome_usuario"], res)) for res in resultado]
     return usuarios
 
-def registrar_pesquisa(db: Session, texto_pesquisa: str):
-    nova_pesquisa = HistoricoPesquisa(usuario_id = Usuario.id, texto_pesquisa=texto_pesquisa)
-    db.add(nova_pesquisa)
-    db.commit()
-    db.refresh(nova_pesquisa)
+#def registrar_pesquisa(db: Session, texto_pesquisa: str):
+#    nova_pesquisa = HistoricoPesquisa(usuario_id = Usuario.id, texto_pesquisa=texto_pesquisa)
+#    db.add(nova_pesquisa)
+#    db.commit()
+#    db.refresh(nova_pesquisa)
+
 def registrar_pesquisado(db:Session,registrar_busca):
     pesquisa =HistoricoPesquisa(usuario_id=registrar_busca.usuario_id, pesquisado_id=registrar_busca.pesquisado_id)
     db.add(pesquisa)
     db.commit()
     db.refresh(pesquisa)
     return pesquisa
+
 def buscar_pesquisado(db: Session, pesquisado_id: int):
-    return db.query(Usuario).filter(Usuario.id == pesquisado_id).first()
+    resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario).filter(Usuario.id == pesquisado_id).first()
+    usuario = [dict(zip(["id", "login", "tipo_usuario", "foto_perfil", "nome_usuario"], resultado))]
+    return usuario
