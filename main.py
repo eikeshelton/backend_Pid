@@ -2,7 +2,7 @@
 from typing import List
 from fastapi import FastAPI, Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario, deletar_foto_perfil,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
+from controllers.usuario_controller import criar_usuario, deletar_bio_usuario, deletar_foto_perfil,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
 from controllers.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
 from dependencies import get_db
 from pydantic import BaseModel
@@ -76,9 +76,14 @@ def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_
 @app.post("/login/")
 def fazer_login(login_data: Login, db: Session = Depends(get_db)):
     return login_usuario(db, login_data.login, login_data.senha)
+
 @app.delete("/usuario/foto/delete/{usuario_id}")
 def usuario_foto_delete(usuario_id: int,db: Session = Depends(get_db)):
     deletar_foto_perfil(db,usuario_id)
+
+@app.delete("/usuario/bio/delete/{usuario_id}")
+def usuario_bio_delete(usuario_id: int,db: Session = Depends(get_db)):
+    deletar_bio_usuario(db,usuario_id)
 
 # Rota para atualizar as informações do perfil
 @app.put("/usuarios/{email}")
