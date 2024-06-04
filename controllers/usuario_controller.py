@@ -34,6 +34,23 @@ def criar_usuario(db: Session, usuario_create):
     return db_usuario
 
 
+def deletar_foto_perfil(db: Session, usuario_id: int):
+    # Obtém o usuário pelo ID
+    usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
+    
+    # Verifica se o usuário existe
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    # Remove a foto de perfil
+    usuario.foto_perfil = None
+    
+    # Salva as alterações no banco de dados
+    db.commit()
+    db.refresh(usuario)
+    
+    return usuario
+
 def login_usuario(db: Session, login: str, senha: str):
     usuario = db.query(Usuario).filter(Usuario.login == login).first()
     if usuario is None:
