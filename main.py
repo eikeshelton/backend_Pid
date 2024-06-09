@@ -1,14 +1,18 @@
-# app.py
-from fastapi import FastAPI, Depends,HTTPException
+# main.py
+from typing import List
+from fastapi import FastAPI, Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, buscar_pesquisado, registrar_pesquisado,obter_token_reset_senha,alterar_senha, limpar_token_reset_senha, adicionar_token_reset_senha
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
+from controllers.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional
-
+from typing import Optional,Dict
+import json
+from starlette.websockets import WebSocketState
 app = FastAPI()
 
+connections: Dict[int, WebSocket] = {}
 # Modelo Pydantic para entrada de dados de cadastro de usuário
 class UsuarioCreate(BaseModel):
     email: str
@@ -53,6 +57,16 @@ class UserSearch(BaseModel):
 class Registrar_Busca(BaseModel):
     usuario_id:int
     pesquisado_id:int 
+    
+class MensagemRecebida(BaseModel):
+    remetente_id:int
+    destinatario_id:int
+    texto:str
+class Mensagem(BaseModel):
+    id:int
+    remetente_id:int
+    destinatario_id:int
+    texto:str
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -131,10 +145,73 @@ def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
 # Rota para registrar algum outro perfil que foi pesquisado pelo usuário
 @app.post("/usuarios/registra-buscar/")
 def buscar_usuarios(registrar_busca:Registrar_Busca,db: Session = Depends(get_db)):
-    historico =registrar_pesquisado(db, registrar_busca)
-    usuario = buscar_pesquisado(db, registrar_busca.pesquisado_id)
-    if usuario is None:
+    registrar_pesquisado(db, registrar_busca)
+    usuarios = buscar_pesquisado(db, registrar_busca.usuario_id)
+    if usuarios is None:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
-    return {"historico_pesquisa": historico, "usuario": usuario}  
+    return usuarios 
+@app.get("/usuarios-pesquisados/{usuario_id}")
+def pesquisados(usuario_id,db: Session = Depends(get_db)):
+    usuarios = buscar_pesquisado(db, usuario_id)
+    if usuarios is None:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    return usuarios
    
+
+@app.get("/chat/mensagens/{remetente_id}/{destinatario_id}")
+async def recuperar_mensagens(remetente_id: int, destinatario_id: int,db: Session = Depends(get_db)) -> List[Mensagem]:
+    conversas = recuperar_conversas_usuario(db,remetente_id,destinatario_id)
+
+    return conversas
+
+
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = Depends(get_db)):
+    await websocket.accept()
+
+    try:
+        # Registrar a conexão do usuário
+        connections[user_id] = websocket
+
+        while True:
+            data = await websocket.receive_text()
+            print("Dados recebidos:", data)  # Verificar os dados recebidos do cliente
+            mensagem_data = json.loads(data)
+            print("Mensagem recebida:", mensagem_data)  # Verificar a mensagem recebida do cliente
+            mensagem = MensagemRecebida(**mensagem_data)
+            cadastrar_mensagem(mensagem, db)
+            
+            # Recuperar a última mensagem cadastrada no banco de dados
+            ultima_mensagem = recuperar_nova_mensagem(db, mensagem.remetente_id, mensagem.destinatario_id)
+            
+            if ultima_mensagem:
+                # Converter a última mensagem para JSON, incluindo apenas os campos desejados
+                ultima_mensagem_json = json.dumps({
+                    "id": ultima_mensagem.id,
+                    "remetente_id": ultima_mensagem.remetente_id,
+                    "destinatario_id": ultima_mensagem.destinatario_id,
+                    "texto": ultima_mensagem.texto
+                })
+                
+                # Obter o WebSocket do destinatário
+                destinatario_websocket = connections.get(mensagem.destinatario_id)
+                remetente_websocket = connections.get(mensagem.remetente_id)
+                # Enviar a última mensagem para o destinatário, se conectado
+                if destinatario_websocket:
+                    await destinatario_websocket.send_text(ultima_mensagem_json)
+                
+                # Enviar a última mensagem para o remetente, se conectado
+                if remetente_websocket:
+                    await remetente_websocket.send_text(ultima_mensagem_json)
+
+    except HTTPException as e:
+        print("Erro HTTP:", e)
+    except Exception as e:
+        print("Erro durante a comunicação WebSocket:", e)
+    finally:
+        # Remover a conexão do usuário ao encerrar
+        if websocket.application_state == WebSocketState.CONNECTED:
+            del connections[user_id]
+            await websocket.close()
