@@ -2,8 +2,9 @@
 from typing import List
 from fastapi import FastAPI, Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
+from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome,buscar_pesquisado,registrar_pesquisado, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha
 from controllers.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
+from controllers.parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from dependencies import get_db
 from pydantic import BaseModel
 from datetime import date
@@ -67,6 +68,18 @@ class Mensagem(BaseModel):
     remetente_id:int
     destinatario_id:int
     texto:str
+
+class ParceiroTreino(BaseModel):
+    modalidade: str
+    dia_da_semana: str
+    estado: str
+    cidade: str
+    local: str
+    agrupamento_muscular: str
+    observacoes: str
+    tempo_treino: int
+    sexo: str
+    id_usuario: int
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -215,3 +228,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = D
         if websocket.application_state == WebSocketState.CONNECTED:
             del connections[user_id]
             await websocket.close()
+
+@app.post("/parceiro-treino/")
+def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Session = Depends(get_db)):
+    return cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
