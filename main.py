@@ -2,7 +2,7 @@
 from typing import List
 from fastapi import FastAPI, Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
+from controllers.usuario_controller import criar_usuario,upload_login,limpar_token_reset_senha,alterar_senha,obter_token_reset_senha,adicionar_token_reset_senha,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
 from controllers.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
 from dependencies import get_db
 from pydantic import BaseModel
