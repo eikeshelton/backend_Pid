@@ -18,4 +18,4 @@ class ParceiroTreino(Base):
     sexo = Column(String(50))
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
 
-    usuario = relationship("Usuario", back_populates="parceiros_treino")
+    usuario = relationship("Usuario", foreign_keys=[id_usuario])

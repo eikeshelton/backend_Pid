@@ -1,5 +1,5 @@
 # models/chat.py
-import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship
 from models.aadeclarative_base import Base
@@ -10,7 +10,7 @@ class Chat(Base):
     remetente_id = Column(Integer, ForeignKey("usuario.id"))
     destinatario_id = Column(Integer, ForeignKey("usuario.id"))
     texto = Column (String)
-    data_envio = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    data_envio = Column(DateTime, default=datetime.now(timezone.utc))
     id_conversa=Column(Integer)
 
     remetente = relationship("Usuario", foreign_keys=[remetente_id])
