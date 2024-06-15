@@ -208,6 +208,7 @@ def registrar_pesquisa(db: Session, texto_pesquisa: str):
     db.add(nova_pesquisa)
     db.commit()
     db.refresh(nova_pesquisa)
+    
 def registrar_pesquisado(db: Session, registrar_busca):
     # Verifica se já existe um registro com o conjunto de usuario_id e pesquisado_id
     pesquisa_existente = db.query(HistoricoPesquisa).filter(
@@ -230,6 +231,7 @@ def registrar_pesquisado(db: Session, registrar_busca):
     db.commit()
     db.refresh(pesquisa)
     return pesquisa
+
 def buscar_pesquisado(db: Session, usuario_id: int,limite: int = 4)-> list[Usuario]:
     # Busca os primeiros 5 registros em HistoricoPesquisa que correspondem ao usuario_id
     pesquisas = db.query(HistoricoPesquisa).filter(HistoricoPesquisa.usuario_id == usuario_id).limit(limite).all()
