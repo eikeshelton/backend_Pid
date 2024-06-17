@@ -73,9 +73,9 @@ class Mensagem(BaseModel):
 class ParceiroTreino(BaseModel):
     modalidade: str
     dia_da_semana: str
-    estado: str
-    municipio: str
-    local: str
+    estado: int
+    municipio: int
+    local: Optional[str] = None
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
     horario: time

@@ -1,22 +1,24 @@
 from sqlalchemy.orm import Session
-from models.parceiro_treino import ParceiroTreino, Estado, Municipio
+from models.parceiro_treino import ParceiroTreino
+from models.estado import Estado
+from models.municipio import Municipio
 from fastapi import HTTPException
 
-def get_estado_id(db: Session, nome_estado: str):
-    estado = db.query(Estado).filter(Estado.nome == nome_estado).first()
+def get_estado_id(db: Session, id_estado: int):
+    estado = db.query(Estado).filter(Estado.codigo_ibge == id_estado).first()
     if not estado:
-        raise HTTPException(status_code=404, detail=f"Estado {nome_estado} não encontrado")
+        raise HTTPException(status_code=404, detail=f"Estado {id_estado} não encontrado")
     return estado.id
 
-def get_municipio_id(db: Session, nome_cidade: str, estado_id: int):
-    municipio = db.query(Municipio).filter(Municipio.nome == nome_cidade, Municipio.estado_id == estado_id).first()
+def get_municipio_id(db: Session, id_cidade: int, estado_id: int):
+    municipio = db.query(Municipio).filter(Municipio.codigo_ibge == id_cidade, Municipio.estado_id == estado_id).first()
     if not municipio:
-        raise HTTPException(status_code=404, detail=f"Município {nome_cidade} não encontrado no estado {estado_id}")
+        raise HTTPException(status_code=404, detail=f"Município {id_cidade} não encontrado no estado {estado_id}")
     return municipio.id
 
 def cadastrar_preferencia_parceiro_treino(db: Session, preferencia_parceiro_treino: ParceiroTreino):
     estado_id = get_estado_id(db, preferencia_parceiro_treino.estado)
-    municipio_id = get_municipio_id(db, preferencia_parceiro_treino.cidade, estado_id)
+    municipio_id = get_municipio_id(db, preferencia_parceiro_treino.municipio, preferencia_parceiro_treino.estado_id)
     
     novo_parceiro_treino = ParceiroTreino(
         modalidade=preferencia_parceiro_treino.modalidade,
