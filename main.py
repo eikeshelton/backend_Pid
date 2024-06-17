@@ -8,7 +8,7 @@ from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cada
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from dependencies import get_db
 from pydantic import BaseModel
-from datetime import date, time
+from datetime import date, time, datetime
 from typing import Optional,Dict
 import json
 from starlette.websockets import WebSocketState
@@ -74,13 +74,14 @@ class ParceiroTreino(BaseModel):
     modalidade: str
     dia_da_semana: str
     estado: str
-    cidade: str
+    municipio: str
     local: str
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
     horario: time
     tempo_treino: Optional[int] = None
     sexo: Optional[str] = None
+    datetime_registro: Optional[datetime] = None
     id_usuario: int
 
 @app.post("/usuarios/")
