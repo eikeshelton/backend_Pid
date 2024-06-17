@@ -1,72 +1,19 @@
 # main.py
 from typing import List
-from fastapi import FastAPI, Depends,HTTPException,WebSocket
+from fastapi import FastAPI, Depends,HTTPException,WebSocket,WebSocketDisconnect
 from sqlalchemy.orm import Session
 from controllers.usuario_controller import criar_usuario,upload_login,limpar_token_reset_senha,alterar_senha,obter_token_reset_senha,adicionar_token_reset_senha,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
 from controllers.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
 from dependencies import get_db
-from pydantic import BaseModel
-from datetime import date
-from typing import Optional,Dict
+from models.schema.schema import UsuarioCreate,MensagemRecebida,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca
+from typing import Dict
 import json
 from starlette.websockets import WebSocketState
 app = FastAPI()
 
-connections: Dict[int, WebSocket] = {}
+connections = {}
 # Modelo Pydantic para entrada de dados de cadastro de usuário
-class UsuarioCreate(BaseModel):
-    email: str
-    nome_usuario: str
-    login: str
-    senha: str
-    tipo_usuario: str
-    data_nascimento: date
-    foto_perfil: bytes
-    bio: str
-class Login(BaseModel):
-    login: str
-    senha: str
 
-class UsuarioUpdate(BaseModel):
-    nome_usuario: Optional[str] = None
-    foto_perfil: Optional[bytes] = None
-    bio: Optional[str] = None
-    tipo_usuario: Optional[str] = None
-# Rota para criar um novo usuário
-class UsuarioSelect(BaseModel):
-    nome_usuario: str
-    tipo_usuario: str
-    foto_perfil: bytes
-    bio: str
-    seguidores:int
-    seguidos:int
-class LoginUpdate(BaseModel):
-    login: str
-    senha: str
-    email: str
-    id:int
-class Credenciais(BaseModel):
-    email: str
-    senha: str
-class UserResetPassword(BaseModel):
-    email: str
-    token: Optional[str]=None
-    new_password:Optional[str]=None
-class UserSearch(BaseModel):
-    login:str
-class Registrar_Busca(BaseModel):
-    usuario_id:int
-    pesquisado_id:int 
-    
-class MensagemRecebida(BaseModel):
-    remetente_id:int
-    destinatario_id:int
-    texto:str
-class Mensagem(BaseModel):
-    id:int
-    remetente_id:int
-    destinatario_id:int
-    texto:str
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -143,7 +90,7 @@ def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
     return usuarios
 
 @app.post("/usuarios/registra-buscar/")
-def buscar_usuarios(registrar_busca:Registrar_Busca,db: Session = Depends(get_db)):
+def buscar_usuarios(registrar_busca:RegistrarBusca,db: Session = Depends(get_db)):
     registrar_pesquisado(db, registrar_busca)
     usuarios = buscar_pesquisado(db, registrar_busca.usuario_id)
     if usuarios is None:
@@ -169,24 +116,23 @@ async def recuperar_mensagens(remetente_id: int, destinatario_id: int,db: Sessio
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = Depends(get_db)):
     await websocket.accept()
-
     try:
         # Registrar a conexão do usuário
-        connections[user_id] = websocket
-
+        if user_id not in connections:
+            connections[user_id] = {}
+        connections[user_id][user_id] = websocket
+        
         while True:
             data = await websocket.receive_text()
-            print("Dados recebidos:", data)  # Verificar os dados recebidos do cliente
             mensagem_data = json.loads(data)
-            print("Mensagem recebida:", mensagem_data)  # Verificar a mensagem recebida do cliente
             mensagem = MensagemRecebida(**mensagem_data)
+            destinatario_id = mensagem.destinatario_id
+            
             cadastrar_mensagem(mensagem, db)
             
-            # Recuperar a última mensagem cadastrada no banco de dados
-            ultima_mensagem = recuperar_nova_mensagem(db, mensagem.remetente_id, mensagem.destinatario_id)
+            ultima_mensagem = recuperar_nova_mensagem(db, mensagem.remetente_id, destinatario_id)
             
             if ultima_mensagem:
-                # Converter a última mensagem para JSON, incluindo apenas os campos desejados
                 ultima_mensagem_json = json.dumps({
                     "id": ultima_mensagem.id,
                     "remetente_id": ultima_mensagem.remetente_id,
@@ -194,23 +140,25 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = D
                     "texto": ultima_mensagem.texto
                 })
                 
-                # Obter o WebSocket do destinatário
-                destinatario_websocket = connections.get(mensagem.destinatario_id)
-                remetente_websocket = connections.get(mensagem.remetente_id)
-                # Enviar a última mensagem para o destinatário, se conectado
-                if destinatario_websocket:
+                # Enviar a última mensagem ao destinatário se ele estiver conectado
+                if destinatario_id in connections and user_id in connections[destinatario_id]:
+                    destinatario_websocket = connections[destinatario_id][user_id]
                     await destinatario_websocket.send_text(ultima_mensagem_json)
                 
-                # Enviar a última mensagem para o remetente, se conectado
-                if remetente_websocket:
+                # Enviar a última mensagem ao remetente
+                if user_id in connections and destinatario_id in connections[user_id]:
+                    remetente_websocket = connections[user_id][destinatario_id]
                     await remetente_websocket.send_text(ultima_mensagem_json)
-
-    except HTTPException as e:
-        print("Erro HTTP:", e)
+                elif user_id in connections:
+                    remetente_websocket = connections[user_id][user_id]
+                    await remetente_websocket.send_text(ultima_mensagem_json)
+    
+    except WebSocketDisconnect:
+        print(f"WebSocket desconectado para o usuário {user_id}")
     except Exception as e:
         print("Erro durante a comunicação WebSocket:", e)
     finally:
         # Remover a conexão do usuário ao encerrar
-        if websocket.application_state == WebSocketState.CONNECTED:
+        if user_id in connections:
             del connections[user_id]
-            await websocket.close()
+        await websocket.close()
