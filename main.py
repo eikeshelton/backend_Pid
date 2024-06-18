@@ -79,7 +79,7 @@ class ParceiroTreino(BaseModel):
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
     horario: time
-    tempo_treino: Optional[int] = None
+    tempo_treino: Optional[time] = None
     sexo: Optional[str] = None
     datetime_registro: Optional[datetime] = None
     id_usuario: int
@@ -234,7 +234,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = D
             await websocket.close()
 
 #Endpoint do cadastro de preferências do Parceiro de Treino
-@app.post("/parceiro-treino/")
+@app.post("/parceiros_treino/cadastro")
 def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Session = Depends(get_db)):
     return cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
 
