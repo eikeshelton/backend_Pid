@@ -78,7 +78,7 @@ class ParceiroTreino(BaseModel):
     local: Optional[str] = None
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
-    horario: time
+    horario: Optional[time] = None
     tempo_treino: Optional[time] = None
     sexo: Optional[str] = None
     datetime_registro: Optional[datetime] = None
