@@ -10,6 +10,7 @@ from dependencies import get_db
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from datetime import datetime, timezone
 
 def criar_usuario(db: Session, usuario_create):
 
@@ -197,15 +198,17 @@ def enviar_email(destinatario: str, token: str):
     # Desconectar do servidor SMTP
     servidor_smtp.quit()
 
-def buscar_usuarios_por_nome(db: Session, login: str, limite: int = 5) -> list[Usuario]:
-     usuarios= db.query(Usuario).filter(Usuario.login.ilike(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
-     return usuarios
+def buscar_usuarios_por_nome(db: Session, login: str, limite: int = 5) -> list[dict]:
+    resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario).filter(Usuario.login.startswith(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
+    usuarios = [dict(zip(["id", "login", "tipo_usuario", "foto_perfil", "nome_usuario"], res)) for res in resultado]
+    return usuarios
 
 def registrar_pesquisa(db: Session, texto_pesquisa: str):
     nova_pesquisa = HistoricoPesquisa(usuario_id = Usuario.id, texto_pesquisa=texto_pesquisa)
     db.add(nova_pesquisa)
     db.commit()
     db.refresh(nova_pesquisa)
+    
 def registrar_pesquisado(db: Session, registrar_busca):
     # Verifica se já existe um registro com o conjunto de usuario_id e pesquisado_id
     pesquisa_existente = db.query(HistoricoPesquisa).filter(
@@ -228,6 +231,7 @@ def registrar_pesquisado(db: Session, registrar_busca):
     db.commit()
     db.refresh(pesquisa)
     return pesquisa
+
 def buscar_pesquisado(db: Session, usuario_id: int,limite: int = 4)-> list[Usuario]:
     # Busca os primeiros 5 registros em HistoricoPesquisa que correspondem ao usuario_id
     pesquisas = db.query(HistoricoPesquisa).filter(HistoricoPesquisa.usuario_id == usuario_id).limit(limite).all()

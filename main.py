@@ -2,9 +2,14 @@
 from typing import List
 from fastapi import FastAPI, Depends,HTTPException,WebSocket,WebSocketDisconnect
 from sqlalchemy.orm import Session
-from controllers.usuario_controller import criar_usuario,upload_login,limpar_token_reset_senha,alterar_senha,obter_token_reset_senha,adicionar_token_reset_senha,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, registrar_pesquisa,buscar_pesquisado,registrar_pesquisado
-from controllers.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
+from controllers.usuario.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome,buscar_pesquisado,registrar_pesquisado, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha
+from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
+from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
+from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from dependencies import get_db
+from pydantic import BaseModel
+from datetime import  time, datetime
+from typing import Optional,Dict
 from models.schema.schema import UsuarioCreate,MensagemRecebida,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca
 from typing import Dict
 import json
@@ -14,6 +19,20 @@ app = FastAPI()
 connections = {}
 # Modelo Pydantic para entrada de dados de cadastro de usuário
 
+
+class ParceiroTreino(BaseModel):
+    modalidade: str
+    dia_da_semana: str
+    estado_codigo_ibge: int
+    municipio_codigo_ibge: int
+    local: Optional[str] = None
+    agrupamento_muscular: Optional[str] = None
+    observacoes: Optional[str] = None
+    horario: time
+    tempo_treino: Optional[time] = None
+    sexo: Optional[str] = None
+    datetime_registro: Optional[datetime] = None
+    id_usuario: int
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -83,12 +102,13 @@ def reset_password(UserResetPassword:UserResetPassword, db: Session = Depends(ge
     else:
         raise HTTPException(status_code=400, detail="Token inválido")
 
-# Rota para buscar usuários por parte do nome e ordenar alfabeticamente
+# Rota para buscar usuários por nome de acordo com o que o usuario digita
 @app.post("/usuarios/buscar/")
 def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
     usuarios = buscar_usuarios_por_nome(db, usersearch.login)
     return usuarios
 
+# Rota para registrar algum outro perfil que foi pesquisado pelo usuário
 @app.post("/usuarios/registra-buscar/")
 def buscar_usuarios(registrar_busca:RegistrarBusca,db: Session = Depends(get_db)):
     registrar_pesquisado(db, registrar_busca)
@@ -97,6 +117,7 @@ def buscar_usuarios(registrar_busca:RegistrarBusca,db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
     return usuarios 
+
 @app.get("/usuarios-pesquisados/{usuario_id}")
 def pesquisados(usuario_id,db: Session = Depends(get_db)):
     usuarios = buscar_pesquisado(db, usuario_id)
@@ -159,6 +180,21 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = D
         print("Erro durante a comunicação WebSocket:", e)
     finally:
         # Remover a conexão do usuário ao encerrar
-        if user_id in connections:
+        if websocket.application_state == WebSocketState.CONNECTED:
             del connections[user_id]
-        await websocket.close()
+            await websocket.close()
+
+#Endpoint do cadastro de preferências do Parceiro de Treino
+@app.post("/parceiros_treino/cadastro")
+def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Session = Depends(get_db)):
+    return cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
+
+#Endpoint da busca pelo Parceiro de Treino, com os filtros definidos.
+@app.post("/parceiros_treino/busca")
+def buscar_parceiros_treino_endpoint(filtros: ParceiroTreino, db: Session = Depends(get_db)):
+    parceiros = buscar_parceiros_treino(db, filtros)
+    
+    if not parceiros:
+        raise HTTPException(status_code=404, detail="Nenhum parceiro de treino encontrado com os filtros fornecidos")
+    
+    return parceiros
