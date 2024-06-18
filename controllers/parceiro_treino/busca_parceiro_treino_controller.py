@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from models.parceiro_treino import ParceiroTreino
 from models.estado import Estado
 from models.municipio import Municipio
+from models.usuario import Usuario
 from fastapi import HTTPException
 from datetime import datetime, timedelta,timezone
 
@@ -24,7 +25,6 @@ def buscar_parceiros_treino(db: Session, filtros: ParceiroTreino):
     
     query = db.query(ParceiroTreino).filter(
         ParceiroTreino.modalidade == filtros.modalidade,
-        ParceiroTreino.dia_da_semana == filtros.dia_da_semana,
         ParceiroTreino.estado_codigo_ibge == estado_id,
         ParceiroTreino.municipio_codigo_ibge == municipio_id,
         ParceiroTreino.local == filtros.local,
@@ -38,8 +38,14 @@ def buscar_parceiros_treino(db: Session, filtros: ParceiroTreino):
         query = query.filter(ParceiroTreino.observacoes == filtros.observacoes)
     if filtros.tempo_treino:
         query = query.filter(ParceiroTreino.tempo_treino == filtros.tempo_treino)
+    if filtros.dia_da_semana:
+        query = query.filter(ParceiroTreino.dia_da_semana == filtros.dia_da_semana)
+    if filtros.local:
+        query = query.filter(ParceiroTreino.local == filtros.local)
+    if filtros.horario:
+        query = query.filter(ParceiroTreino.horario == filtros.horario)
     if filtros.sexo:
-        query = query.filter(ParceiroTreino.sexo == filtros.sexo)
+        query = query.filter(Usuario.sexo == filtros.sexo)
     
     parceiros = query.all()
     return parceiros

@@ -30,7 +30,6 @@ def cadastrar_preferencia_parceiro_treino(db: Session, preferencia_parceiro_trei
         observacoes=preferencia_parceiro_treino.observacoes,
         horario=preferencia_parceiro_treino.horario,
         tempo_treino=preferencia_parceiro_treino.tempo_treino,
-        sexo=preferencia_parceiro_treino.sexo,
         id_usuario=preferencia_parceiro_treino.id_usuario
     )
     db.add(novo_parceiro_treino)

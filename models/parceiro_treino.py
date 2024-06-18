@@ -18,7 +18,6 @@ class ParceiroTreino(Base):
     observacoes = Column(String(250))
     horario = Column(Time)
     tempo_treino = Column(Time)
-    sexo = Column(String(50))
     datetime_registro = Column(DateTime, default=datetime.now(timezone.utc))
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
 

@@ -22,17 +22,17 @@ connections = {}
 
 class ParceiroTreino(BaseModel):
     modalidade: str
-    dia_da_semana: str
+    dia_da_semana: Optional[str] = None
     estado_codigo_ibge: int
     municipio_codigo_ibge: int
     local: Optional[str] = None
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
-    horario: time
+    horario: Optional[time] = None
     tempo_treino: Optional[time] = None
     sexo: Optional[str] = None
     datetime_registro: Optional[datetime] = None
-    id_usuario: int
+    id_usuario: Optional[int] = None
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
