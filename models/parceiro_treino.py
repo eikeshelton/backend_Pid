@@ -1,3 +1,4 @@
+# models.parceiro_treino.py
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, Time, DateTime
 from datetime import datetime, timezone
 from sqlalchemy.orm import relationship
@@ -10,8 +11,8 @@ class ParceiroTreino(Base):
     id = Column(Integer, primary_key=True, index=True)
     modalidade = Column(String(100), nullable=False)
     dia_da_semana = Column(String(50))
-    estado = Column(Integer, ForeignKey("estado.codigo_ibge"), nullable=False)
-    municipio = Column(Integer, ForeignKey("municipio.codigo_ibge"), nullable=False)
+    estado_codigo_ibge = Column(Integer, ForeignKey("estado.codigo_ibge"), nullable=False)
+    municipio_codigo_ibge = Column(Integer, ForeignKey("municipio.codigo_ibge"), nullable=False)
     local = Column(String(250))
     agrupamento_muscular = Column(Text)
     observacoes = Column(String(250))
@@ -22,5 +23,5 @@ class ParceiroTreino(Base):
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
 
     usuario = relationship("Usuario", foreign_keys=[id_usuario])
-    estado = relationship("Estado", back_populates="parceiros_treino")
-    municipio = relationship("Municipio", back_populates="parceiros_treino")
+    estado_relacionamento = relationship("Estado", back_populates="parceiros_treino")
+    municipio_relacionamento = relationship("Municipio", back_populates="parceiros_treino")

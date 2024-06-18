@@ -13,7 +13,7 @@ def fetch_and_store_states(cursor):
         """, (state['nome'], state['sigla'], state['id']))
 
 def fetch_and_store_cities(cursor):
-    cursor.execute("SELECT id, sigla FROM estado")
+    cursor.execute("SELECT codigo_ibge, sigla FROM estado")
     states = cursor.fetchall()
 
     for state in states:
@@ -32,7 +32,7 @@ def main():
     connection = psycopg2.connect(
         dbname="projeto_pid",
         user="postgres",
-        password="postgres",
+        password="1234",
         host="127.0.0.1",
         port="5432"
     )

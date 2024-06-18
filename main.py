@@ -73,8 +73,8 @@ class Mensagem(BaseModel):
 class ParceiroTreino(BaseModel):
     modalidade: str
     dia_da_semana: str
-    estado: int
-    municipio: int
+    estado_codigo_ibge: int
+    municipio_codigo_ibge: int
     local: Optional[str] = None
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
