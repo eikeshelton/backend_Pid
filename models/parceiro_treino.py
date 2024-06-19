@@ -3,8 +3,7 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey, Time, DateTime
 from datetime import datetime, timezone
 from sqlalchemy.orm import relationship
 from models.aadeclarative_base import Base
-from models.usuario import Usuario
-
+from .usuario import Usuario 
 class ParceiroTreino(Base):
     __tablename__ = "parceiro_treino"
 
@@ -21,6 +20,6 @@ class ParceiroTreino(Base):
     datetime_registro = Column(DateTime, default=datetime.now(timezone.utc))
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
 
-    usuario = relationship("Usuario", foreign_keys=[id_usuario])
+    usuario = relationship("Usuario")
     estado_relacionamento = relationship("Estado", back_populates="parceiros_treino")
     municipio_relacionamento = relationship("Municipio", back_populates="parceiros_treino")

@@ -9,7 +9,6 @@ class HistoricoPesquisa(Base):
     id = Column(INTEGER, primary_key=True, index=True)
     usuario_id = Column(INTEGER, ForeignKey("usuario.id"))
     pesquisado_id = Column(INTEGER, ForeignKey("usuario.id"))
-    timestamp = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
 
     usuario = relationship("Usuario", foreign_keys=[usuario_id], back_populates="pesquisas")
     pesquisado = relationship("Usuario", foreign_keys=[pesquisado_id], back_populates="pesquisas_pesquisado")

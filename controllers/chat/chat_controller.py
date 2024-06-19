@@ -5,8 +5,7 @@ from sqlalchemy import or_, and_
 from sqlalchemy import func
 from models.usuario import Usuario
 
-UsuarioRemetente = aliased(Usuario)
-UsuarioDestinatario = aliased(Usuario)
+
 
 def cadastrar_mensagem(mensagem,db: Session):
     # Verifica se já existe uma conversa entre remetente e destinatário
@@ -42,11 +41,14 @@ def recuperar_nova_mensagem(db: Session, remetente_id: int, destinatario_id: int
     
     return ultima_mensagem
 def recuperar_conversas_usuario(db: Session, remetente_id: int, destinatario_id: int):
+    UsuarioRemetente = aliased(Usuario)
+    UsuarioDestinatario = aliased(Usuario)
     conversas = (
         db.query(
             Chat,
             UsuarioRemetente.nome_usuario.label('nome_remetente'),
-            UsuarioDestinatario.nome_usuario.label('nome_destinatario')
+            UsuarioDestinatario.nome_usuario.label('nome_destinatario'),
+            
         )
         .join(UsuarioRemetente, Chat.remetente_id == UsuarioRemetente.id)
         .join(UsuarioDestinatario, Chat.destinatario_id == UsuarioDestinatario.id)
@@ -61,11 +63,12 @@ def recuperar_conversas_usuario(db: Session, remetente_id: int, destinatario_id:
 
     # Converting to dictionary manually
     conversas_dict = []
-    for chat, nome_remetente, nome_destinatario in conversas:
+    for chat, nome_remetente, nome_destinatario, in conversas:
         chat_dict = chat.to_dict()
         chat_dict.update({
             "nome_remetente": nome_remetente,
             "nome_destinatario": nome_destinatario,
+            "id_conversa": chat.id_conversa,
         })
         conversas_dict.append(chat_dict)
 

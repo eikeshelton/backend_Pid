@@ -21,5 +21,6 @@ class Chat(Base):
             "remetente_id": self.remetente_id,
             "destinatario_id": self.destinatario_id,
             "texto": self.texto,
+            "id_conversa":self.id_conversa,
             # Outros campos que você deseja incluir no dicionário...
         }

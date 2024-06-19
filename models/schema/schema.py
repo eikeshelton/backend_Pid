@@ -63,5 +63,6 @@ class Mensagem(BaseModel):
     remetente_id: int
     destinatario_id: int
     texto: str
+    id_conversa:int
 
 
