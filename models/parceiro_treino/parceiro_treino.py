@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey, Time, DateTime
 from datetime import datetime, timezone
 from sqlalchemy.orm import relationship
 from models.aadeclarative_base import Base
-from .usuario import Usuario 
+from ..usuario.usuario import Usuario 
 class ParceiroTreino(Base):
     __tablename__ = "parceiro_treino"
 

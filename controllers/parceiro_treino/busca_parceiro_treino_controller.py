@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
-from models.parceiro_treino import ParceiroTreino
-from models.usuario import Usuario
+from models.parceiro_treino.parceiro_treino import ParceiroTreino
+from models.usuario.usuario import Usuario
 from fastapi import HTTPException
 from datetime import datetime, timedelta, timezone
-from models.estado import Estado
-from models.municipio import Municipio
+from models.estado.estado import Estado
+from models.municipio.municipio import Municipio
 from pydantic import BaseModel
 from typing import List
 class ParceiroTreinoResponse(BaseModel):
