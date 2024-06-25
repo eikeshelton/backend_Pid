@@ -189,7 +189,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, user_id2: int, 
 #Endpoint do cadastro de preferências do Parceiro de Treino
 @app.post("/parceiros_treino/cadastro")
 def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Session = Depends(get_db)):
-    return cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
+    cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
 
 #Endpoint da busca pelo Parceiro de Treino, com os filtros definidos.
 @app.post("/parceiros_treino/busca")
