@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, Depends,HTTPException,WebSocket,WebSocketDisconnect
 from sqlalchemy.orm import Session
 from controllers.usuario.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha
-from controllers.historico.historico import registrar_pesquisado,buscar_pesquisado,registrar_pesquisa
+from controllers.historico.historico import registrar_pesquisado,buscar_pesquisado
 from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
@@ -11,7 +11,7 @@ from dependencies import get_db
 from pydantic import BaseModel
 from datetime import  time, datetime
 from typing import Optional,Dict
-from models.schema.schema import UsuarioCreate,MensagemRecebida,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca
+from models.schema.schema import UsuarioCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca
 from typing import Dict
 import json
 from starlette.websockets import WebSocketState
@@ -21,19 +21,7 @@ connections: Dict[int, WebSocket] = {}
 
 
 
-class ParceiroTreino(BaseModel):
-    modalidade: str
-    estado_codigo_ibge: int
-    municipio_codigo_ibge: int
-    dia_da_semana: Optional[str] = None
-    local: Optional[str] = ""
-    agrupamento_muscular: Optional[str] = None
-    observacoes: Optional[str] = None
-    horario: Optional[time] = None
-    tempo_treino: Optional[time] = None
-    sexo: Optional[str] = None
-    datetime_registro: Optional[datetime] = None
-    id_usuario: Optional[int] = None
+
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):

@@ -4,11 +4,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 
-def registrar_pesquisa(db: Session, texto_pesquisa: str):
-    nova_pesquisa = HistoricoPesquisa(usuario_id = Usuario.id, texto_pesquisa=texto_pesquisa)
-    db.add(nova_pesquisa)
-    db.commit()
-    db.refresh(nova_pesquisa)
+
     
 def registrar_pesquisado(db: Session, registrar_busca):
     pesquisa_existente = db.query(HistoricoPesquisa).filter(
