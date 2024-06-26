@@ -5,27 +5,9 @@ from fastapi import HTTPException
 from datetime import datetime, timedelta, timezone
 from models.estado import Estado
 from models.municipio import Municipio
-from pydantic import BaseModel
-from typing import List,Optional
-class ParceiroTreinoResponse(BaseModel):
-    id: int
-    id_usuario:int
-    modalidade: str
-    estado_codigo_ibge: int
-    municipio_codigo_ibge: int
-    local: Optional[str] = None
-    horario: Optional[str] = None
-    datetime_registro: datetime
-    nome_usuario: str
-    foto_perfil: Optional[str] = None
-    sexo_usuario: Optional[str] = None
-    seguidores:int
-    seguidos:int
-    bio:Optional[str] = None
-    login:str
+from models.schema.schema import ParceiroTreinoResponse
+from typing import List
 
-    class Config:
-        from_attributes = True
 
 def get_estado_id(db: Session, id_estado: int):
     estado = db.query(Estado).filter(Estado.codigo_ibge == id_estado).first()

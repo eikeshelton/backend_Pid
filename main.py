@@ -7,9 +7,8 @@ from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conver
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from dependencies import get_db
-from pydantic import BaseModel
-from datetime import  time, datetime
-from typing import Optional,Dict
+from models.schema.schema import ParceiroTreino
+from typing import Dict
 from models.schema.schema import UsuarioCreate,MensagemRecebida,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca
 from typing import Dict
 import json
@@ -20,19 +19,7 @@ connections: Dict[int, WebSocket] = {}
 
 
 
-class ParceiroTreino(BaseModel):
-    modalidade: str
-    estado_codigo_ibge: int
-    municipio_codigo_ibge: int
-    dia_da_semana: Optional[str] = None
-    local: Optional[str] = ""
-    agrupamento_muscular: Optional[str] = None
-    observacoes: Optional[str] = None
-    horario: Optional[time] = None
-    tempo_treino: Optional[time] = None
-    sexo: Optional[str] = None
-    datetime_registro: Optional[datetime] = None
-    id_usuario: Optional[int] = None
+
 
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
