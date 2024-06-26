@@ -29,14 +29,10 @@ def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_
 def fazer_login(login_data: Login, db: Session = Depends(get_db)):
     return login_usuario(db, login_data.login, login_data.senha)
 
-
-
 # Rota para atualizar as informações do perfil
 @app.put("/usuarios/{email}")
 def atualizar_dados_usuario(email: str, usuario_update: UsuarioUpdate, db: Session = Depends(get_db)):
     return atualizar_usuario(db, email, usuario_update)
-
-
 
 # Rota para atualizar o usuario
 @app.get("/usuarios/{email}")
@@ -45,13 +41,11 @@ def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
     usuario = obter_dados_usuario(email, db)
     return usuario
 
-
 @app.post("/check-credentials/")
 def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depends(get_db)):
     
     # Chama a função verificar_credenciais para obter o ID do usuário
     usuario = verificar_credenciais(db, credenciais.email, credenciais.senha)
-        
     # Retorna o ID do usuário
     return usuario
     
@@ -63,7 +57,6 @@ def upload_login_endpoint(LoginUpdate: LoginUpdate, db: Session = Depends(get_db
     # Retorna uma resposta indicando se as credenciais são válidas
     if not usuario:
         raise HTTPException(status_code=401, detail="não cadastrado")
-
     return usuario
 
 # Rota para solicitar redefinição de senha
@@ -101,7 +94,6 @@ def buscar_usuarios(registrar_busca:RegistrarBusca,db: Session = Depends(get_db)
     usuarios = buscar_pesquisado(db, registrar_busca.usuario_id)
     if usuarios is None:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    
     return usuarios 
 
 @app.get("/usuarios-pesquisados/{usuario_id}")
@@ -109,25 +101,19 @@ def pesquisados(usuario_id,db: Session = Depends(get_db)):
     usuarios = buscar_pesquisado(db, usuario_id)
     if usuarios is None:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    
     return usuarios
    
-
 @app.get("/chat/mensagens/{remetente_id}/{destinatario_id}")
 async def recuperar_mensagens(remetente_id: int, destinatario_id: int,db: Session = Depends(get_db)) -> List[Mensagem]:
     conversas = recuperar_conversas_usuario(db,remetente_id,destinatario_id)
-
     return conversas
-
 
 @app.websocket("/ws/{user_id}/{user_id2}")
 async def websocket_endpoint(websocket: WebSocket, user_id: int, user_id2: int, db: Session = Depends(get_db)):
     await websocket.accept()
-
     try:
         # Registrar a conexão do usuário
         connections[(user_id, user_id2)] = websocket
-
         while True:
             data = await websocket.receive_text()
             print("Dados recebidos:", data)  # Verificar os dados recebidos do cliente
@@ -135,10 +121,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, user_id2: int, 
             print("Mensagem recebida:", mensagem_data)  # Verificar a mensagem recebida do cliente
             mensagem = MensagemRecebida(**mensagem_data)
             cadastrar_mensagem(mensagem, db)
-            
             # Recuperar a última mensagem cadastrada no banco de dados
             ultima_mensagem = recuperar_nova_mensagem(db, mensagem.remetente_id, mensagem.destinatario_id)
-            
             if ultima_mensagem:
                 # Converter a última mensagem para JSON, incluindo apenas os campos desejados
                 ultima_mensagem_json = json.dumps({
@@ -155,11 +139,9 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, user_id2: int, 
                 # Enviar a última mensagem para o destinatário, se conectado
                 if destinatario_websocket:
                     await destinatario_websocket.send_text(ultima_mensagem_json)
-                
                 # Enviar a última mensagem para o remetente, se conectado
                 if remetente_websocket:
                     await remetente_websocket.send_text(ultima_mensagem_json)
-
     except HTTPException as e:
         print("Erro HTTP:", e)
     except Exception as e:
@@ -181,8 +163,6 @@ def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Se
 @app.post("/parceiros_treino/busca")
 def buscar_parceiros_treino_endpoint(filtros: ParceiroTreino, db: Session = Depends(get_db)):
     parceiros = buscar_parceiros_treino(db, filtros)
-    
     if not parceiros:
         raise HTTPException(status_code=404, detail="Nenhum parceiro de treino encontrado com os filtros fornecidos")
-    
     return parceiros
