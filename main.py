@@ -1,16 +1,18 @@
 # main.py
 from typing import List
-from fastapi import FastAPI, Depends,HTTPException,WebSocket,WebSocketDisconnect
+from fastapi import FastAPI, Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
-from controllers.usuario.usuario_controller import criar_usuario,upload_login,verificar_credenciais,login_usuario,atualizar_usuario,obter_dados_usuario, buscar_usuarios_por_nome, adicionar_token_reset_senha, obter_token_reset_senha, alterar_senha, limpar_token_reset_senha
+from controllers.usuario.atualizar_usuario.atualizar_usuario import atualizar_usuario,obter_dados_usuario,upload_login
+from controllers.usuario.buscar_usuarios.Buscar_usuarios import buscar_usuarios_por_nome
+from controllers.usuario.logar_usuario.Logar_usuario import login_usuario
+from controllers.usuario.registrar_usuario.Registrar_usuario import criar_usuario
+from controllers.usuario.verificar_senhas.Verificar_senhas import adicionar_token_reset_senha,alterar_senha,limpar_token_reset_senha,obter_token_reset_senha,verificar_credenciais
 from controllers.historico.historico import registrar_pesquisado,buscar_pesquisado
 from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from dependencies import get_db
-from pydantic import BaseModel
-from datetime import  time, datetime
-from typing import Optional,Dict
+from typing import Dict
 from models.schema.schema import UsuarioCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca
 from typing import Dict
 import json
@@ -18,11 +20,6 @@ from starlette.websockets import WebSocketState
 app = FastAPI()
 
 connections: Dict[int, WebSocket] = {}
-
-
-
-
-
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
     return criar_usuario(db, usuario_create)
