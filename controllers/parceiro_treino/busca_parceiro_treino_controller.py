@@ -6,22 +6,22 @@ from datetime import datetime, timedelta, timezone
 from models.estado import Estado
 from models.municipio import Municipio
 from pydantic import BaseModel
-from typing import List
+from typing import List,Optional
 class ParceiroTreinoResponse(BaseModel):
     id: int
     id_usuario:int
     modalidade: str
     estado_codigo_ibge: int
     municipio_codigo_ibge: int
-    local: str
-    horario: str
+    local: Optional[str] = None
+    horario: Optional[str] = None
     datetime_registro: datetime
     nome_usuario: str
-    foto_perfil: str
-    sexo_usuario: str
+    foto_perfil: Optional[str] = None
+    sexo_usuario: Optional[str] = None
     seguidores:int
     seguidos:int
-    bio:str
+    bio:Optional[str] = None
     login:str
 
     class Config:
