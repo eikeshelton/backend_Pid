@@ -60,6 +60,7 @@ class Mensagem(BaseModel):
 
 
 class ParceiroTreino(BaseModel):
+    id_usuario: Optional[int] = None
     modalidade: str
     estado_codigo_ibge: int
     municipio_codigo_ibge: int
@@ -67,8 +68,21 @@ class ParceiroTreino(BaseModel):
     local: Optional[str] = ""
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
-    horario: Optional[time] = None
+    horario: Optional[str] = None
     tempo_treino: Optional[time] = None
     sexo: Optional[str] = None
     datetime_registro: Optional[datetime] = None
-    id_usuario: Optional[int] = None
+    
+
+class ParceiroTreinoResponse(ParceiroTreino):
+    id: int
+    nome_usuario: str
+    foto_perfil: Optional[str] = None
+    sexo_usuario: Optional[str] = None
+    seguidores:int
+    seguidos:int
+    bio:Optional[str] = None
+    login:str
+
+    class Config:
+        from_attributes = True

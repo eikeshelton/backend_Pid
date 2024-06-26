@@ -10,18 +10,20 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+def criptografar(senha:str)->str:
+    senha_bytes = senha.encode('utf-8')
+    hashed_password = bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
+    return hashed_password.decode("utf-8")
+
 def criar_usuario(db: Session, usuario_create):
-
-    senha = usuario_create.senha.encode('utf-8')
-
-    hashed_password = bcrypt.hashpw(senha, bcrypt.gensalt())
+    hashed_password = criptografar(usuario_create.senha)
     
     # Cria o usuário com a senha hash
     db_usuario = Usuario(
         email=usuario_create.email,
         nome_usuario=usuario_create.nome_usuario,
         login=usuario_create.login,
-        senha=hashed_password.decode("utf-8"),
+        senha=hashed_password,
         tipo_usuario=usuario_create.tipo_usuario,
         data_nascimento=usuario_create.data_nascimento,
         bio=usuario_create.bio,
@@ -197,7 +199,8 @@ def enviar_email(destinatario: str, token: str):
     servidor_smtp.quit()
 
 def buscar_usuarios_por_nome(db: Session, login: str, limite: int = 5) -> list[dict]:
-    resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario,Usuario.bio).filter(Usuario.login.startswith(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
-    usuarios = [dict(zip(["id_usuario", "login", "tipo_usuario", "foto_perfil", "nome_usuario","bio"], res)) for res in resultado]
+    resultado = db.query(Usuario).with_entities(Usuario.id, Usuario.login, Usuario.tipo_usuario, Usuario.foto_perfil, Usuario.nome_usuario,Usuario.bio,Usuario.seguidores,
+    Usuario.seguidos).filter(Usuario.login.startswith(f'%{login}%')).order_by(Usuario.login).limit(limite).all()
+    usuarios = [dict(zip(["id_usuario", "login", "tipo_usuario", "foto_perfil", "nome_usuario","bio","seguidores","seguidos"], res)) for res in resultado]
     return usuarios
 
