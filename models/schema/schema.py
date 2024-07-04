@@ -100,3 +100,9 @@ class SeguidoresResponse(BaseModel):
 class FCMTokenUpdate(BaseModel):
     fcm_token: str
     id_usuario: int
+
+class Conversas(BaseModel):
+    foto_perfil:str
+    remetente_id:int
+    destinatario_id:int
+    ultima_mensagem:str

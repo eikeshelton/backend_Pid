@@ -24,3 +24,8 @@ class Chat(Base):
             "id_conversa":self.id_conversa,
             # Outros campos que você deseja incluir no dicionário...
         }
+    def to_dict_conversations(self):
+        return{
+            "id_conversa":self.id_conversa,
+            # Outros campos que você deseja incluir no dicionário...
+        }

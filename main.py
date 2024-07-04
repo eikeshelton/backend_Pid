@@ -8,13 +8,13 @@ from controllers.usuario.logar_usuario.Logar_usuario import login_usuario
 from controllers.usuario.registrar_usuario.Registrar_usuario import criar_usuario
 from controllers.usuario.verificar_senhas.Verificar_senhas import adicionar_token_reset_senha,alterar_senha,limpar_token_reset_senha,obter_token_reset_senha,verificar_credenciais
 from controllers.historico.historico import registrar_pesquisado,buscar_pesquisado
-from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem
+from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem,conversas_chat
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguidores,lista_usuarios_seguidos,contar_seguidores_e_seguidos,buscar_seguidores_seguidos,verifica_seguidor,cancelar_seguir,atualizar_fcmToken
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate
+from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas
 from typing import Dict
 import json
 from starlette.websockets import WebSocketState
@@ -204,3 +204,7 @@ def seguidores_seguidos(id_usuario:int,db:Session=Depends(get_db)):
 def fcm_token(fcm_token_update:FCMTokenUpdate, db: Session = Depends(get_db)):
    atualizar_fcmToken(fcm_token_update,db)
    
+@app.get("/conversas_usuario/{id_usuario}")
+def conversas_usuario(id_usuario:int,db:Session=Depends(get_db)):
+    conversas_usuario=conversas_chat(id_usuario,db)
+    return conversas_usuario
