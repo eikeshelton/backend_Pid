@@ -1,6 +1,6 @@
 import bcrypt
 from sqlalchemy.orm import Session
-from models.usuario.usuario import Usuario
+from models.usuario import Usuario
 
 # Cria o usuário com a senha hash
 def criptografar(senha:str)->str:

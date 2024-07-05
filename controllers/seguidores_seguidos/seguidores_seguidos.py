@@ -3,7 +3,7 @@ from google.auth.transport.requests import Request
 from FCMManager import get_access_token
 from fastapi import HTTPException
 from models.seguidores_seguidos.seguidores_seguidos import SeguidoresSeguidos
-from models.usuario.usuario import Usuario
+from models.usuario import Usuario
 from sqlalchemy import  and_,func
 from sqlalchemy.orm import Session
 def registrar_seguidores(seguidores, db:Session):

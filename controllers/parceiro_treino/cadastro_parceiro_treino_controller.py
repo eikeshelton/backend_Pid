@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from models.parceiro_treino.parceiro_treino import ParceiroTreino
-from models.estado.estado import Estado
-from models.municipio.municipio import Municipio
+from models.parceiro_treino import ParceiroTreino
+from models.estado import Estado
+from models.municipio import Municipio
 from fastapi import HTTPException
 
 def get_estado_id(db: Session, id_estado: int):

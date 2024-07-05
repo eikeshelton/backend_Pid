@@ -1,4 +1,4 @@
-from models.estado.estado import Estado
+from models.estado import Estado
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 

@@ -1,8 +1,8 @@
 #controllers/chat_controller.py
-from models.chat.chat import Chat
+from models.chat import Chat
 from sqlalchemy.orm import Session,aliased
 from sqlalchemy import or_, and_,func,desc
-from models.usuario.usuario import Usuario
+from models.usuario import Usuario
 
 
 
