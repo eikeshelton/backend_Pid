@@ -1,7 +1,7 @@
 import bcrypt
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.usuario import Usuario
+from models.usuario.usuario import Usuario
 
 
 

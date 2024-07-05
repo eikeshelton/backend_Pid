@@ -1,5 +1,5 @@
-from models.historico import HistoricoPesquisa
-from models.usuario import Usuario
+from models.historico.historico import HistoricoPesquisa
+from models.usuario.usuario import Usuario
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 

@@ -1,4 +1,4 @@
-from models.municipio import Municipio
+from models.municipio.municipio import Municipio
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 

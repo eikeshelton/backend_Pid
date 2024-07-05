@@ -2,7 +2,7 @@ import bcrypt
 import secrets
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.usuario import Usuario
+from models.usuario.usuario import Usuario
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
