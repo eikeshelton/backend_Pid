@@ -2,8 +2,7 @@ import bcrypt
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,Depends
 from models.usuario.usuario import Usuario
-from dependencies import get_db
-from controllers.seguidores_seguidos.seguidores_seguidos import contar_seguidores_e_seguidos
+
 
 
 def atualizar_usuario(db: Session, email: str, usuario_update: Usuario):
