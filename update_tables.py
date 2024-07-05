@@ -31,9 +31,9 @@ def fetch_and_store_cities(cursor):
 def main():
     connection = psycopg2.connect(
         dbname="projeto_pid",
-        user="postgres",
-        password="1234",
-        host="127.0.0.1",
+        user="esfs",
+        password="999178058Eike",
+        host="projetopid.cjs6ku6kun0r.us-east-1.rds.amazonaws.com",
         port="5432"
     )
     cursor = connection.cursor()

@@ -1,39 +1,32 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date,datetime,time
 from typing import Optional
-
-# Definição das classes de dados usando Pydantic
-class UsuarioCreate(BaseModel):
-    email: EmailStr
-    nome_usuario: str
-    login: str
-    senha: str
-    tipo_usuario: str
-    data_nascimento: date
-    foto_perfil: bytes
-    bio: str
-
-class Login(BaseModel):
-    login: str
-    senha: str
-
-class UsuarioUpdate(BaseModel):
+#classe abstrata 
+class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
     foto_perfil: Optional[bytes] = None
     bio: Optional[str] = None
     tipo_usuario: Optional[str] = None
 
-class UsuarioSelect(BaseModel):
-    nome_usuario: str
-    tipo_usuario: str
-    foto_perfil: bytes
-    bio: str
+class UsuarioCreate(PessoaBase):
+    email: EmailStr
+    login: str
+    senha: str
+    data_nascimento: date
+
+
+class Login(BaseModel):
+    login: str
+    senha: str
+
+class UsuarioUpdate(PessoaBase):
+    pass
+
+class UsuarioSelect(PessoaBase):
     seguidores: int
     seguidos: int
 
-class LoginUpdate(BaseModel):
-    login: str
-    senha: str
+class LoginUpdate(Login):
     email: EmailStr
     id: int
 
@@ -67,6 +60,7 @@ class Mensagem(BaseModel):
 
 
 class ParceiroTreino(BaseModel):
+    id_usuario: Optional[int] = None
     modalidade: str
     estado_codigo_ibge: int
     municipio_codigo_ibge: int
@@ -74,25 +68,14 @@ class ParceiroTreino(BaseModel):
     local: Optional[str] = ""
     agrupamento_muscular: Optional[str] = None
     observacoes: Optional[str] = None
-    horario: Optional[time] = None
+    horario: Optional[str] = None
     tempo_treino: Optional[time] = None
     sexo: Optional[str] = None
     datetime_registro: Optional[datetime] = None
-    id_usuario: Optional[int] = None
+    
 
-
-
-
-
-class ParceiroTreinoResponse(BaseModel):
+class ParceiroTreinoResponse(ParceiroTreino):
     id: int
-    id_usuario:int
-    modalidade: str
-    estado_codigo_ibge: int
-    municipio_codigo_ibge: int
-    local: Optional[str] = None
-    horario: Optional[str] = None
-    datetime_registro: datetime
     nome_usuario: str
     foto_perfil: Optional[str] = None
     sexo_usuario: Optional[str] = None
@@ -103,3 +86,23 @@ class ParceiroTreinoResponse(BaseModel):
 
     class Config:
         from_attributes = True
+class SeguidoresCreate(BaseModel):
+    id_seguidor: int
+    id_seguido: int
+class SeguidoresResponse(BaseModel):
+    id: int
+    id_seguidor: int
+    id_seguido: int
+
+    class Config:
+        from_attributes = True
+
+class FCMTokenUpdate(BaseModel):
+    fcm_token: str
+    id_usuario: int
+
+class Conversas(BaseModel):
+    foto_perfil:str
+    remetente_id:int
+    destinatario_id:int
+    ultima_mensagem:str

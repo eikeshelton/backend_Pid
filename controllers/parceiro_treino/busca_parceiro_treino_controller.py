@@ -1,25 +1,12 @@
 from sqlalchemy.orm import Session
-from models.parceiro_treino import ParceiroTreino
-from models.usuario import Usuario
+from models.parceiro_treino.parceiro_treino import ParceiroTreino
+from models.usuario.usuario import Usuario
+from controllers.estados_municipios.estados import get_estado_id
+from controllers.estados_municipios.municipios import get_municipio_id
 from fastapi import HTTPException
 from datetime import datetime, timedelta, timezone
-from models.estado import Estado
-from models.municipio import Municipio
-from models.schema.schema import ParceiroTreinoResponse
 from typing import List
-
-
-def get_estado_id(db: Session, id_estado: int):
-    estado = db.query(Estado).filter(Estado.codigo_ibge == id_estado).first()
-    if not estado:
-        raise HTTPException(status_code=404, detail=f"Estado {id_estado} não encontrado")
-    return estado.codigo_ibge
-
-def get_municipio_id(db: Session, id_cidade: int, estado_id: int):
-    municipio = db.query(Municipio).filter(Municipio.codigo_ibge == id_cidade, Municipio.estado_id == estado_id).first()
-    if not municipio:
-        raise HTTPException(status_code=404, detail=f"Município {id_cidade} não encontrado no estado {estado_id}")
-    return municipio.codigo_ibge
+from models.schema.schema import ParceiroTreinoResponse
 
 def buscar_parceiros_treino(db: Session, filtros) -> List[ParceiroTreinoResponse]:
     estado_id = get_estado_id(db, filtros.estado_codigo_ibge)
