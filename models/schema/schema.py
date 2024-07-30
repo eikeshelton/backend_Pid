@@ -106,3 +106,6 @@ class Conversas(BaseModel):
     remetente_id:int
     destinatario_id:int
     ultima_mensagem:str
+
+class SeguidoresAcao(SeguidoresCreate):
+    acao: str  

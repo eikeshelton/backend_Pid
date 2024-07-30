@@ -11,13 +11,14 @@ from controllers.historico.historico import registrar_pesquisado,buscar_pesquisa
 from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem,conversas_chat
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
-from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguidores,lista_usuarios_seguidos,contar_seguidores_e_seguidos,buscar_seguidores_seguidos,verifica_seguidor,cancelar_seguir,atualizar_fcmToken
+from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguidores,lista_usuarios_seguidos,lista_usuarios_seguidores,contar_seguidores_e_seguidos,buscar_seguidores_seguidos,verifica_seguidor,cancelar_seguir,atualizar_fcmToken,acao_seguir,solicitacoes
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas
+from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas,SeguidoresAcao
 from typing import Dict
 import json
 from starlette.websockets import WebSocketState
+
 app = FastAPI()
 
 connections: Dict[int, WebSocket] = {}
@@ -181,7 +182,11 @@ def registrar_seguidor(seguidores: SeguidoresCreate, db: Session = Depends(get_d
 async def usuarios_seguidos(id_usuario: int, db: Session = Depends(get_db)) -> List[dict]:
         usuarios = lista_usuarios_seguidos(id_usuario,db)
         return usuarios
-
+# verifica quais usuarios seguem o usuario
+@app.get("/usuarios_seguidores/{id_usuario}")
+async def usuarios_seguidos(id_usuario: int, db: Session = Depends(get_db)) -> List[dict]:
+        usuarios = lista_usuarios_seguidores(id_usuario,db)
+        return usuarios
 #verifica se um usuario segue outro
 @app.get("/verificar_seguimento/{id_usuario}/{id_usuario2}")
 async def verificar_seguimento(id_usuario: int,id_usuario2:int, db: Session = Depends(get_db)):
@@ -203,8 +208,19 @@ def seguidores_seguidos(id_usuario:int,db:Session=Depends(get_db)):
 @app.post("/atualizar-fcm-token/")
 def fcm_token(fcm_token_update:FCMTokenUpdate, db: Session = Depends(get_db)):
    atualizar_fcmToken(fcm_token_update,db)
-   
+#lista de todas as conversas do usuario
 @app.get("/conversas_usuario/{id_usuario}")
 def conversas_usuario(id_usuario:int,db:Session=Depends(get_db)):
     conversas_usuario=conversas_chat(id_usuario,db)
     return conversas_usuario
+
+#lista de todas as solicitaçoes pendentes do usuario
+@app.get("/lista_solicitacoes_pendentes/{id_usuario}")
+def lista_solicitacoes(id_usuario,db:Session=Depends(get_db)):
+    lista = solicitacoes(id_usuario,db)
+    return lista
+
+@app.post("/seguidores/acao/")
+def seguimento(seguidores: SeguidoresAcao, db: Session = Depends(get_db)):
+    relacao= acao_seguir(seguidores,db)
+    return relacao

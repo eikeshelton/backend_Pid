@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
+#models.seguidores_seguidos
+from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint,String
 from models.aadeclarative_base import Base
 
 
@@ -7,6 +8,7 @@ class SeguidoresSeguidos(Base):
     id = Column(Integer, primary_key=True, index=True)
     id_seguidor = Column(Integer, ForeignKey('usuario.id'), nullable=False)
     id_seguido = Column(Integer, ForeignKey('usuario.id'), nullable=False)
+    status = Column(String, default='pendente')
     __table_args__ = (UniqueConstraint('id_seguidor', 'id_seguido', name='unique_seguir'),)
     
     
