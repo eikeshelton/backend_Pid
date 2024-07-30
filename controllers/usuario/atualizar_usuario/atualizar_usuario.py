@@ -5,8 +5,9 @@ from models.usuario.usuario import Usuario
 
 
 
-def atualizar_usuario(db: Session, email: str, usuario_update: Usuario):
+def atualizar_usuario(db: Session, email: str, usuario_update):
     db_usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    
     if db_usuario:
         # Atualizar os campos do usuário com base nos dados fornecidos
         for key, value in usuario_update.dict(exclude_unset=True).items():
