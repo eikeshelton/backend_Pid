@@ -42,10 +42,6 @@ def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
 
     usuario = obter_dados_usuario(email, db)
     return usuario
-
-@app.get("/contar_seguidores_seguidos/{id_usuario}")
-def contar_seguidores_seguidos(id_usuario:int,db:Session= Depends(get_db)):
-    contar_seguidores_e_seguidos(id_usuario, db)
     
 @app.post("/check-credentials/")
 def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depends(get_db)):
