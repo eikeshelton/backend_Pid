@@ -15,10 +15,8 @@ from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguid
 from dependencies import get_db
 from typing import Dict
 from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas,SeguidoresAcao
-from typing import Dict
 import json
 from starlette.websockets import WebSocketState
-
 app = FastAPI()
 
 connections: Dict[int, WebSocket] = {}
