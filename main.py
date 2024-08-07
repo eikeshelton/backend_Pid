@@ -15,10 +15,8 @@ from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguid
 from dependencies import get_db
 from typing import Dict
 from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas,SeguidoresAcao
-from typing import Dict
 import json
 from starlette.websockets import WebSocketState
-
 app = FastAPI()
 
 connections: Dict[int, WebSocket] = {}
@@ -42,10 +40,6 @@ def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
 
     usuario = obter_dados_usuario(email, db)
     return usuario
-
-@app.get("/contar_seguidores_seguidos/{id_usuario}")
-def contar_seguidores_seguidos(id_usuario:int,db:Session= Depends(get_db)):
-    contar_seguidores_e_seguidos(id_usuario, db)
     
 @app.post("/check-credentials/")
 def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depends(get_db)):
