@@ -12,7 +12,7 @@ class Usuario(Base):
     senha = Column(String)
     tipo_usuario = Column(String)
     data_nascimento = Column(Date)
-    foto_perfil = Column(BINARY)
+    foto_perfil = Column(String)
     bio = Column(String)
     seguidores = Column(Integer, default=0)
     seguidos = Column(Integer, default=0)

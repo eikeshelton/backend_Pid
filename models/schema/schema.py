@@ -4,7 +4,7 @@ from typing import Optional
 #classe abstrata 
 class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
-    foto_perfil: Optional[bytes] = None
+    foto_perfil: Optional[str] = None
     bio: Optional[str] = None
     tipo_usuario: Optional[str] = None
 
@@ -41,6 +41,9 @@ class UserResetPassword(BaseModel):
 
 class UserSearch(BaseModel):
     login: str
+
+class UserSearchType(BaseModel):
+    tipo_usuario:str
 
 class RegistrarBusca(BaseModel):
     usuario_id: int
@@ -109,3 +112,15 @@ class Conversas(BaseModel):
 
 class SeguidoresAcao(SeguidoresCreate):
     acao: str  
+
+
+class GuiaCreate(BaseModel):
+    titulo: str
+    foto_url: str
+    id_usuario:int
+
+class GuiaResponse(BaseModel):
+    id_guias: int
+    titulo: str
+    foto_url: str
+    id_usuario: int

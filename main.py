@@ -2,19 +2,20 @@
 from typing import List
 from fastapi import FastAPI, Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
-from controllers.usuario.atualizar_usuario.atualizar_usuario import atualizar_usuario,obter_dados_usuario,upload_login
-from controllers.usuario.buscar_usuarios.Buscar_usuarios import buscar_usuarios_por_nome
-from controllers.usuario.logar_usuario.Logar_usuario import login_usuario
-from controllers.usuario.registrar_usuario.Registrar_usuario import criar_usuario
-from controllers.usuario.verificar_senhas.Verificar_senhas import adicionar_token_reset_senha,alterar_senha,limpar_token_reset_senha,obter_token_reset_senha,verificar_credenciais
-from controllers.historico.historico import registrar_pesquisado,buscar_pesquisado
-from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conversas_usuario,recuperar_nova_mensagem,conversas_chat
-from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
-from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
-from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguidores,lista_usuarios_seguidos,lista_usuarios_seguidores,contar_seguidores_e_seguidos,buscar_seguidores_seguidos,verifica_seguidor,cancelar_seguir,atualizar_fcmToken,acao_seguir,solicitacoes
+from controllers.usuario.atualizar_usuario.atualizar_usuario import *
+from controllers.usuario.buscar_usuarios.Buscar_usuarios import *
+from controllers.usuario.logar_usuario.Logar_usuario import *
+from controllers.usuario.registrar_usuario.Registrar_usuario import *
+from controllers.usuario.verificar_senhas.Verificar_senhas import *
+from controllers.historico.historico import *
+from controllers.chat.chat_controller import *
+from controllers.parceiro_treino.cadastro_parceiro_treino_controller import *
+from controllers.parceiro_treino.busca_parceiro_treino_controller import *
+from controllers.seguidores_seguidos.seguidores_seguidos import *
+from controllers.guias.guias import *
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas,SeguidoresAcao
+from models.schema.schema import *
 import json
 from starlette.websockets import WebSocketState
 app = FastAPI()
@@ -86,6 +87,11 @@ def reset_password(UserResetPassword:UserResetPassword, db: Session = Depends(ge
 def buscar_usuarios(usersearch:UserSearch,db: Session = Depends(get_db)):
     usuarios = buscar_usuarios_por_nome(db, usersearch.login)
     return usuarios
+@app.post("/usuarios/buscar/filtro")
+def buscar_usuarios_filtro(usersearchtype:UserSearchType, db:Session=Depends(get_db)):
+    usuarios= buscar_usuario_por_tipo(usersearchtype.tipo_usuario,db)
+    return usuarios
+
 
 # Rota para registrar algum outro perfil que foi pesquisado pelo usuário
 @app.post("/usuarios/registra-buscar/")
@@ -218,3 +224,12 @@ def lista_solicitacoes(id_usuario,db:Session=Depends(get_db)):
 def seguimento(seguidores: SeguidoresAcao, db: Session = Depends(get_db)):
     relacao= acao_seguir(seguidores,db)
     return relacao
+
+@app.post("/guias/")
+def create_guia(guia: GuiaCreate, db: Session = Depends(get_db)):
+    guia =cadastrar_guia(guia,db)
+    return guia
+@app.get("/buscar/guias/{id_usuario}")
+def read_guias(id_usuario, db: Session = Depends(get_db))-> List[GuiaResponse]:
+    guias =buscar_guias(id_usuario,db)
+    return guias
