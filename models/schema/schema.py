@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date,datetime,time
-from typing import Optional
+from typing import List, Optional
 #classe abstrata 
 class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
@@ -106,3 +106,31 @@ class Conversas(BaseModel):
     remetente_id:int
     destinatario_id:int
     ultima_mensagem:str
+
+class AlimentoBase(BaseModel):
+    numero: int
+    grupo: str
+    descricao: str
+    energia_kcal: float
+    proteina_g: float
+    carboidrato_g: float
+
+class AlimentoCreate(AlimentoBase):
+    pass
+
+class AlimentoResponse(AlimentoBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class RefeicaoBase(BaseModel):
+    nome: str
+    descricao: Optional[str] = None
+
+class RefeicaoCreate(RefeicaoBase):
+    pass
+
+class RefeicaoResponse(RefeicaoBase):
+    id: int
+    alimentos: List[AlimentoResponse] = []
