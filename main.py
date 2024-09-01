@@ -12,9 +12,11 @@ from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conver
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguidores,lista_usuarios_seguidos,contar_seguidores_e_seguidos,buscar_seguidores_seguidos,verifica_seguidor,cancelar_seguir,atualizar_fcmToken
+from controllers.refeicao.refeicoes import criar_refeicao, adicionar_alimentos, listar_refeicoes
+from controllers.alimento import listar_alimentos, obter_alimento
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas
+from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas, RefeicaoCreate, RefeicaoResponse, AlimentoResponse
 import json
 from starlette.websockets import WebSocketState
 app = FastAPI()
@@ -207,3 +209,24 @@ def fcm_token(fcm_token_update:FCMTokenUpdate, db: Session = Depends(get_db)):
 def conversas_usuario(id_usuario:int,db:Session=Depends(get_db)):
     conversas_usuario=conversas_chat(id_usuario,db)
     return conversas_usuario
+
+#criar uma nova refeicao
+@app.post("/refeicoes/", response_model=RefeicaoResponse)
+def criar_refeicao_endpoint(refeicao: RefeicaoCreate, db: Session = Depends(get_db)):
+    return criar_refeicao(refeicao, db)
+
+@app.post("/refeicoes/{refeicao_id}/alimentos/")
+def adicionar_alimentos_endpoint(refeicao_id: int, alimentos_ids: List[int], db: Session = Depends(get_db)):
+    return adicionar_alimentos(refeicao_id, alimentos_ids, db)
+
+@app.get("/refeicoes/", response_model=List[RefeicaoResponse])
+def listar_refeicoes_endpoint(db: Session = Depends(get_db)):
+    return listar_refeicoes(db)
+
+@app.get("/alimentos/", response_model=List[AlimentoResponse])
+def listar_alimentos_endpoint(db: Session = Depends(get_db)):
+    return listar_alimentos(db)
+
+@app.get("/alimentos/{alimento_id}", response_model=AlimentoResponse)
+def obter_alimento_endpoint(alimento_id: int, db: Session = Depends(get_db)):
+    return obter_alimento(alimento_id, db)
