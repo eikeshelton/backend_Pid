@@ -1,7 +1,8 @@
 # controllers/refeicao_controller.py
 from sqlalchemy.orm import Session
 from models.refeicao import Refeicao
-from models.schemas import RefeicaoCreate, RefeicaoResponse
+from models.alimentos import Alimento
+from models.schema import RefeicaoCreate, RefeicaoResponse
 from fastapi import HTTPException
 
 def criar_refeicao(refeicao_create: RefeicaoCreate, db: Session) -> RefeicaoResponse:
