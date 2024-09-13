@@ -114,7 +114,7 @@ class AlimentoBase(BaseModel):
     energia_kcal: float
     proteina_g: float
     carboidrato_g: float
-    quantidade_g: float
+    quantidade_g: int
     lipideos_g: float
 
 class AlimentoCreate(AlimentoBase):

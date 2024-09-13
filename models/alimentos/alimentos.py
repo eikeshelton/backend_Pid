@@ -13,4 +13,4 @@ class Alimento(Base):
     proteina_g = Column(Float)
     carboidrato_g = Column(Float)
     lipideos_g = Column(Float)
-    quantidade_g = Column(Float)
+    quantidade_g = Column(Integer, nullable=True)

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models.refeicao.refeicao import Refeicao
 from models.alimentos.alimentos import Alimento
 from models.refeicao_alimento.refeicao_alimento import RefeicaoAlimento
-from models.schema import RefeicaoCreate, RefeicaoResponse
+from models.schema.schema import RefeicaoCreate, RefeicaoResponse
 from fastapi import HTTPException
 
 def criar_refeicao(refeicao_create: RefeicaoCreate, db: Session) -> RefeicaoResponse:

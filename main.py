@@ -12,8 +12,8 @@ from controllers.chat.chat_controller import cadastrar_mensagem,recuperar_conver
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import cadastrar_preferencia_parceiro_treino
 from controllers.parceiro_treino.busca_parceiro_treino_controller import buscar_parceiros_treino
 from controllers.seguidores_seguidos.seguidores_seguidos import registrar_seguidores,lista_usuarios_seguidos,contar_seguidores_e_seguidos,buscar_seguidores_seguidos,verifica_seguidor,cancelar_seguir,atualizar_fcmToken
-from controllers.refeicao.refeicoes import criar_refeicao, adicionar_alimentos, listar_refeicoes, calcular_valores_totais
-from controllers.alimento.alimentos import listar_alimentos, obter_alimento
+from controllers.refeicao.refeicoes import *
+from controllers.alimento.alimentos import *
 from dependencies import get_db
 from typing import Dict
 from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas, RefeicaoCreate, RefeicaoResponse, AlimentoResponse, RefeicaoBase, AlimentoBase
@@ -226,9 +226,9 @@ def listar_refeicoes_endpoint(usuario_id: int, db: Session = Depends(get_db)):
 
 @app.get("/alimentos/", response_model=List[AlimentoResponse])
 def listar_alimentos(db: Session = Depends(get_db)):
-    return listar_alimentos(db)
+    return lista_alimentos(db)
 
-@app.get("/alimentos/{descricao}", response_model=AlimentoResponse)
+@app.get("/alimentos/{descricao}", response_model=List[AlimentoResponse])
 def obter_alimento_endpoint(descricao: str, db: Session = Depends(get_db)):
     return obter_alimento(descricao, db)
 
