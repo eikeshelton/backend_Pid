@@ -8,7 +8,3 @@ class RefeicaoAlimento(Base):
     refeicao_id = Column(Integer, ForeignKey('refeicoes.id'), nullable=False)
     alimento_id = Column(Integer, ForeignKey('alimentos.id'), nullable=False)
     usuario_id = Column(Integer, ForeignKey('usuario.id'), nullable=False)
-
-    __table_args__ = (
-        UniqueConstraint('refeicao_id', 'alimento_id', 'usuario_id',  name='unique_refeicao_alimento_usuario'),
-    )

@@ -108,13 +108,14 @@ class Conversas(BaseModel):
     ultima_mensagem:str
 
 class AlimentoBase(BaseModel):
-    numero: int
+    id: int
     grupo: str
     descricao: str
     energia_kcal: float
     proteina_g: float
     carboidrato_g: float
     quantidade_g: float
+    lipideos_g: float
 
 class AlimentoCreate(AlimentoBase):
     pass
@@ -126,6 +127,7 @@ class AlimentoResponse(AlimentoBase):
         orm_mode = True
 
 class RefeicaoBase(BaseModel):
+    id: int
     nome: str
     descricao: Optional[str] = None
 

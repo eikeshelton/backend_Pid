@@ -16,7 +16,7 @@ from controllers.refeicao.refeicoes import criar_refeicao, adicionar_alimentos, 
 from controllers.alimento.alimentos import listar_alimentos, obter_alimento
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas, RefeicaoCreate, RefeicaoResponse, AlimentoResponse
+from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas, RefeicaoCreate, RefeicaoResponse, AlimentoResponse, RefeicaoBase, AlimentoBase
 import json
 from starlette.websockets import WebSocketState
 app = FastAPI()

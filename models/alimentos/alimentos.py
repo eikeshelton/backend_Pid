@@ -6,14 +6,11 @@ from models.aadeclarative_base import Base
 class Alimento(Base):
     __tablename__ = "alimentos"
     
-    numero = Column(Integer)
+    id = Column(Integer, primary_key=True, autoincrement=True) 
     grupo = Column(String)
     descricao = Column(String)
     energia_kcal = Column(Float)
     proteina_g = Column(Float)
     carboidrato_g = Column(Float)
+    lipideos_g = Column(Float)
     quantidade_g = Column(Float)
-    
-    refeicoes = relationship("Refeicao",
-                             secondary="refeicoes_alimentos",
-                             back_populates="alimentos")
