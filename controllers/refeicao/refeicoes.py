@@ -24,8 +24,32 @@ def adicionar_alimentos(refeicao_id: int, alimentos_ids: list[int], db: Session)
     
     db.commit()
     db.refresh(refeicao)
-    return RefeicaoResponse.from_orm(refeicao)
+    return refeicao
 
 def listar_refeicoes(db: Session):
     refeicoes = db.query(Refeicao).all()
     return [RefeicaoResponse.from_orm(refeicao) for refeicao in refeicoes]
+
+def calcular_valores_totais(db: Session, refeicao_id: int):
+    refeicao = db.query(Refeicao).filter(Refeicao.id == refeicao_id).first()
+
+    if not refeicao:
+        raise HTTPException(status_code=404, detail="Refeição não encontrada")
+
+    total_energia_kcal = 0
+    total_proteina_g = 0
+    total_carboidrato_g = 0
+
+    for alimento_refeicao in refeicao.alimentos:
+        quantidade_g = alimento_refeicao.quantidade_g
+        alimento = alimento_refeicao.alimento
+
+        total_energia_kcal += (alimento.energia_kcal * quantidade_g) / 100
+        total_proteina_g += (alimento.proteina_g * quantidade_g) / 100
+        total_carboidrato_g += (alimento.carboidrato_g * quantidade_g) / 100
+
+    return {
+        "total_energia_kcal": total_energia_kcal,
+        "total_proteina_g": total_proteina_g,
+        "total_carboidrato_g": total_carboidrato_g
+    }

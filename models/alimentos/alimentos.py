@@ -12,6 +12,7 @@ class Alimento(Base):
     energia_kcal = Column(Float)
     proteina_g = Column(Float)
     carboidrato_g = Column(Float)
+    quantidade_g = Column(Float)
     
     refeicoes = relationship("Refeicao",
                              secondary="refeicoes_alimentos",

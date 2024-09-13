@@ -8,8 +8,8 @@ def listar_alimentos(db: Session):
     alimentos = db.query(Alimento).all()
     return [AlimentoResponse.from_orm(alimento) for alimento in alimentos]
 
-def obter_alimento(alimento_id: int, db: Session) -> AlimentoResponse:
-    alimento = db.query(Alimento).filter(Alimento.id == alimento_id).first()
+def obter_alimento(descricao: int, db: Session) -> AlimentoResponse:
+    alimento = db.query(Alimento).filter(Alimento.descricao == descricao).first()
     if not alimento:
         raise HTTPException(status_code=404, detail="Alimento não encontrado")
     return AlimentoResponse.from_orm(alimento)
