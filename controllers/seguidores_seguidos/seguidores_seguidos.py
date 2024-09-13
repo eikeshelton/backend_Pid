@@ -203,6 +203,7 @@ def enviar_notificacao_seguir(id_seguidor: int, id_seguido: int, db: Session, pe
         notification=messaging.Notification(
             title=title,
             body=body,
+            image=seguidor.foto_perfil
         ),
         android=messaging.AndroidConfig(
             notification=messaging.AndroidNotification(
