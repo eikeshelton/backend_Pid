@@ -1,7 +1,8 @@
 # controllers/refeicao_controller.py
 from sqlalchemy.orm import Session
-from models.refeicao import Refeicao
-from models.alimentos import Alimento
+from models.refeicao.refeicao import Refeicao
+from models.alimentos.alimentos import Alimento
+from models.refeicao_alimento.refeicao_alimento import RefeicaoAlimento
 from models.schema import RefeicaoCreate, RefeicaoResponse
 from fastapi import HTTPException
 
@@ -12,23 +13,27 @@ def criar_refeicao(refeicao_create: RefeicaoCreate, db: Session) -> RefeicaoResp
     db.refresh(refeicao_db)
     return RefeicaoResponse.from_orm(refeicao_db)
 
-def adicionar_alimentos(refeicao_id: int, alimentos_ids: list[int], db: Session):
+def adicionar_alimentos(refeicao_id: int, alimento_id: int, db: Session):
     refeicao = db.query(Refeicao).filter(Refeicao.id == refeicao_id).first()
     if not refeicao:
         raise HTTPException(status_code=404, detail="Refeição não encontrada")
 
-    for alimento_id in alimentos_ids:
-        alimento = db.query(Alimento).filter(Alimento.id == alimento_id).first()
-        if alimento:
-            refeicao.alimentos.append(alimento)
+    alimento = db.query(Alimento).filter(Alimento.id == alimento_id).first()
+    if alimento:
+        refeicao.alimentos.append(alimento)
+        db.commit()
+        db.refresh(refeicao)
     
-    db.commit()
-    db.refresh(refeicao)
     return refeicao
 
-def listar_refeicoes(db: Session):
-    refeicoes = db.query(Refeicao).all()
-    return [RefeicaoResponse.from_orm(refeicao) for refeicao in refeicoes]
+def listar_refeicoes(usuario_id: int, db: Session):
+    refeicoesAlimentos = db.query(RefeicaoAlimento).filter(RefeicaoAlimento.usuario_id == usuario_id)
+
+    refeicoes_ids = [refeicoesAlimentos.refeicao_id for refeicao in refeicoesAlimentos]
+
+    refeicoes = db.query(Refeicao).filter(Refeicao.id.in_(refeicoes_ids)).all()
+    
+    return refeicoes
 
 def calcular_valores_totais(db: Session, refeicao_id: int):
     refeicao = db.query(Refeicao).filter(Refeicao.id == refeicao_id).first()

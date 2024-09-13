@@ -215,13 +215,14 @@ def conversas_usuario(id_usuario:int,db:Session=Depends(get_db)):
 def criar_refeicao(refeicao: RefeicaoCreate, db: Session = Depends(get_db)):
     return criar_refeicao(refeicao, db)
 
+
 @app.post("/refeicoes/{refeicao_id}/alimentos/")
-def adicionar_alimentos_endpoint(refeicao_id: int, alimentos_ids: List[int], db: Session = Depends(get_db)):
-    return adicionar_alimentos(refeicao_id, alimentos_ids, db)
+def adicionar_alimentos_endpoint(refeicao_id: int, alimento_id: int, db: Session = Depends(get_db)):
+    return adicionar_alimentos(refeicao_id, alimento_id, db)
 
 @app.get("/refeicoes/", response_model=List[RefeicaoResponse])
-def listar_refeicoes_endpoint(db: Session = Depends(get_db)):
-    return listar_refeicoes(db)
+def listar_refeicoes_endpoint(usuario_id: int, db: Session = Depends(get_db)):
+    return listar_refeicoes(usuario_id, db)
 
 @app.get("/alimentos/", response_model=List[AlimentoResponse])
 def listar_alimentos(db: Session = Depends(get_db)):
