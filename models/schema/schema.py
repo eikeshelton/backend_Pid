@@ -4,7 +4,7 @@ from typing import List, Optional
 #classe abstrata 
 class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
-    foto_perfil: Optional[bytes] = None
+    foto_perfil: Optional[str] = None
     bio: Optional[str] = None
     tipo_usuario: Optional[str] = None
 

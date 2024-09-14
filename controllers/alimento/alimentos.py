@@ -4,10 +4,6 @@ from models.alimentos.alimentos import Alimento
 from models.schema.schema import AlimentoResponse
 from fastapi import HTTPException
 
-def lista_alimentos(db: Session):
-    alimentos = db.query(Alimento).all()
-    return alimentos
-
 def obter_alimento(descricao: str, db: Session) -> AlimentoResponse:
     alimentos = db.query(Alimento).filter(Alimento.descricao.ilike(f'{descricao.lower()}%')).order_by(Alimento.descricao).all()
     if not alimentos:
