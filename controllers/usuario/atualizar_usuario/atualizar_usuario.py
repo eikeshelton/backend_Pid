@@ -29,7 +29,7 @@ def obter_dados_usuario(email: str, db: Session):
     # Retornar os dados do usuário
     return usuario
     
-def upload_login(db: Session,login_update: Usuario, senha_update: Usuario.senha, email_update: Usuario.email,id:Usuario.id):
+def upload_login(db: Session, login_update: Usuario, senha_update: str, email_update: str, id: int):
     # Busca o usuário no banco de dados pelo id atual fornecido
     usuario = db.query(Usuario).filter(Usuario.id == id).first()
     
