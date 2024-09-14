@@ -45,7 +45,7 @@ def contar_seguidores_e_seguidos(id_seguidor: int, id_seguido: int, db: Session)
         status_condicao = "aceito"
     else:
         # Contagem para outros tipos de usuário (todos os pendentes)
-        status_condicao = "pendente"
+        status_condicao = "aceito"
 
     # Contar quantos seguidores o usuário seguidor tem com o status especificado
     seguidores_count_seguidor = db.query(func.count(SeguidoresSeguidos.id)).filter(
