@@ -229,7 +229,13 @@ def seguimento(seguidores: SeguidoresAcao, db: Session = Depends(get_db)):
 def create_guia(guia: GuiaCreate, db: Session = Depends(get_db)):
     guia =cadastrar_guia(guia,db)
     return guia
-@app.get("/buscar/guias/{id_usuario}")
+@app.get("/buscar/capas/guias/{id_usuario}")
 def read_guias(id_usuario, db: Session = Depends(get_db))-> List[GuiaResponse]:
-    guias =buscar_guias(id_usuario,db)
+    guias =buscar_capas_guias(id_usuario,db)
     return guias
+
+@app.get("buscar/guia/{id_guia}")
+def endpont_buscar_guia_id(id_guia,db:Session= Depends(get_db)):
+    guia = busca_guia_id(id_guia,db)
+    return guia
+
