@@ -25,8 +25,14 @@ def registrar_pesquisado(db: Session, registrar_busca):
     return pesquisa
 
 def buscar_pesquisado(db: Session, usuario_id: int, limite: int = 4) -> list[dict]:
-    # Busca os primeiros registros em HistoricoPesquisa que correspondem ao usuario_id
-    pesquisas = db.query(HistoricoPesquisa).filter(HistoricoPesquisa.usuario_id == usuario_id).limit(limite).all()
+    # Busca os últimos registros em HistoricoPesquisa que correspondem ao usuario_id, ordenados pelo id (incremental)
+    pesquisas = (
+        db.query(HistoricoPesquisa)
+        .filter(HistoricoPesquisa.usuario_id == usuario_id)
+        .order_by(HistoricoPesquisa.id.desc())  # Ordena pelos IDs mais recentes
+        .limit(limite)
+        .all()
+    )
 
     # Coleta os IDs dos pesquisados
     pesquisado_ids = [pesquisa.pesquisado_id for pesquisa in pesquisas]
