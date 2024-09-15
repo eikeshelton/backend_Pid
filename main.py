@@ -244,3 +244,18 @@ def end_point_buscar_id_refeicao(db:Session=Depends(get_db)):
 @app.post("/buscar/info/alimento")
 def endpoint_buscar_info_alimento(buscarAlimento:BuscaAlimento,db: Session = Depends(get_db)):
     return buscar_info_alimento(buscarAlimento,db)
+
+@app.post("/cadastrar/guia")
+def endpoint_cadastrar_guia(guia:GuiaCreate,db: Session = Depends(get_db)):
+    return cadastrar_guia(guia,db)
+@app.get("/buscar/capas/guias/{id_usuario}")
+def endpoint_buscar_capa_guias(id_usuario:int,db:Session = Depends(get_db)):
+    return buscar_capas_guias(id_usuario,db)
+
+@app.get("/buscar/guias/id/{id_guia}")
+def endpoint_buscar_capa_guias(id_guia:int,db:Session = Depends(get_db)):
+    return busca_guia_id(id_guia,db)
+
+@app.post("/cadastrar/guia/teste")
+def endpoint_cadastrar_guia(guia:GuiaCreateteste,db: Session = Depends(get_db)):
+    return cadastrar_guia_teste(guia,db)

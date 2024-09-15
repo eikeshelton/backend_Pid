@@ -12,7 +12,7 @@ class CapaGuia(Base):
     user = relationship("Usuario")
 
 class Guia(Base):
-    __tablename__ = "guias"
+    __tablename__ = "guia"
     id=Column(Integer, primary_key=True, index=True)
     id_guia = Column(Integer)
     id_usuario = Column(Integer)

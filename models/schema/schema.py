@@ -117,6 +117,12 @@ class GuiaCreate(BaseModel):
     titulo: str
     foto_url: str
     id_usuario:int
+class GuiaCreateteste(BaseModel):
+    id_guia:int
+    id_usuario:int
+    foto_guia:str
+    titulo_guia:str
+    texto_guia:str
 
 class GuiaResponse(BaseModel):
     id_guias: int
