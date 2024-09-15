@@ -16,7 +16,7 @@ from controllers.refeicao.refeicoes import *
 from controllers.alimento.alimentos import *
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import UsuarioCreate,SeguidoresCreate,MensagemRecebida,ParceiroTreino,Login,LoginUpdate,Mensagem,UsuarioUpdate,Credenciais,UserResetPassword,UserSearch,RegistrarBusca,FCMTokenUpdate,Conversas, RefeicaoCreate, RefeicaoResponse, AlimentoResponse, RefeicaoBase, AlimentoBase
+from models.schema.schema import*
 import json
 from starlette.websockets import WebSocketState
 app = FastAPI()
@@ -210,27 +210,27 @@ def conversas_usuario(id_usuario:int,db:Session=Depends(get_db)):
     conversas_usuario=conversas_chat(id_usuario,db)
     return conversas_usuario
 
-#criar uma nova refeicao
-@app.post("/refeicoes/", response_model=RefeicaoResponse)
-def criar_refeicao(refeicao: RefeicaoCreate, db: Session = Depends(get_db)):
-    return criar_refeicao(refeicao, db)
+@app.get("/buscar/id/refeicao")
+def end_point_buscar_id_refeicao(db:Session=Depends(get_db)):
+    buscar_id_refeicao=db.query(Refeicao).all()
+    return buscar_id_refeicao
+@app.post("/refeicoes/alimentos/")
+def adicionar_alimentos_endpoint(alimento:AlimentoSchema, db: Session = Depends(get_db)):
+    return adicionar_alimentos(alimento, db)
 
-
-@app.post("/refeicoes/{refeicao_id}/alimentos/")
-def adicionar_alimentos_endpoint(refeicao_id: int,quantidade:float, alimento_id: int, db: Session = Depends(get_db)):
-    return adicionar_alimentos(refeicao_id,quantidade, alimento_id, db)
-
-@app.get("/refeicoes/", response_model=List[RefeicaoResponse])
-def listar_refeicoes_endpoint(usuario_id: int, db: Session = Depends(get_db)):
-    return listar_refeicoes(usuario_id, db)
+@app.get("/refeicoes/{usuario_id}/{data}")
+def listar_refeicoes_endpoint(usuario_id: int,data:date, db: Session = Depends(get_db)):
+    return listar_refeicoes(usuario_id,data, db)
 
 
 @app.get("/alimentos/{descricao}", response_model=List[AlimentoResponse])
 def obter_alimento_endpoint(descricao: str, db: Session = Depends(get_db)):
     return obter_alimento(descricao, db)
 
-@app.get("/refeicao/{refeicao_id}/valores_totais")
-def calcular_totais_refeicao(refeicao_id: int, db: Session = Depends(get_db)):
-    # Chama o controller para calcular os valores
-    totais = calcular_valores_totais(db, refeicao_id)
-    return totais
+app.get("/buscar/info/alimento")
+def end_point_buscar_id_refeicao(db:Session=Depends(get_db)):
+    buscar_id_refeicao=db.query(Refeicao).all()
+    return buscar_id_refeicao
+@app.post("/buscar/info/alimento")
+def endpoint_buscar_info_alimento(buscarAlimento:BuscaAlimento,db: Session = Depends(get_db)):
+    return buscar_info_alimento(buscarAlimento,db)

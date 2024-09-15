@@ -127,13 +127,35 @@ class AlimentoResponse(AlimentoBase):
         orm_mode = True
 
 class RefeicaoBase(BaseModel):
-    id: int
     nome: str
     descricao: Optional[str] = None
+
+class RefeicaoResponse(RefeicaoBase):
+   id_refeicao: int
+
 
 class RefeicaoCreate(RefeicaoBase):
     pass
 
-class RefeicaoResponse(RefeicaoBase):
-    id: int
-    alimentos: List[AlimentoResponse] = []
+class RefeicaoResponse(BaseModel):
+    nome: str
+    descricao: str | None
+    id_refeicao: int
+
+    class Config:
+        model_validate = True
+class AlimentoSchema(BaseModel):
+    id_usuario:int
+    refeicao_id: int
+    quantidade:float
+    alimento_id: int
+
+class RefeicaoResponseList(BaseModel):
+    total_energia_kcal: float
+    total_proteina_g: float
+    total_carboidrato_g: float
+    total_lipideos_g: float
+
+class BuscaAlimento(BaseModel):
+    id_usuario:int
+    data:date
