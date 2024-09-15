@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date,datetime,time
-from typing import Optional
+from typing import List, Optional
 #classe abstrata 
 class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
@@ -109,7 +109,6 @@ class Conversas(BaseModel):
     remetente_id:int
     destinatario_id:int
     ultima_mensagem:str
-
 class SeguidoresAcao(SeguidoresCreate):
     acao: str  
 
@@ -124,3 +123,55 @@ class GuiaResponse(BaseModel):
     titulo: str
     foto_url: str
     id_usuario: int
+class AlimentoBase(BaseModel):
+    id: int
+    grupo: str
+    descricao: str
+    energia_kcal: float
+    proteina_g: float
+    carboidrato_g: float
+    quantidade_g: int
+    lipideos_g: float
+
+class AlimentoCreate(AlimentoBase):
+    pass
+
+class AlimentoResponse(AlimentoBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class RefeicaoBase(BaseModel):
+    nome: str
+    descricao: Optional[str] = None
+
+class RefeicaoResponse(RefeicaoBase):
+   id_refeicao: int
+
+
+class RefeicaoCreate(RefeicaoBase):
+    pass
+
+class RefeicaoResponse(BaseModel):
+    nome: str
+    descricao: str | None
+    id_refeicao: int
+
+    class Config:
+        model_validate = True
+class AlimentoSchema(BaseModel):
+    id_usuario:int
+    refeicao_id: int
+    quantidade:float
+    alimento_id: int
+
+class RefeicaoResponseList(BaseModel):
+    total_energia_kcal: float
+    total_proteina_g: float
+    total_carboidrato_g: float
+    total_lipideos_g: float
+
+class BuscaAlimento(BaseModel):
+    id_usuario:int
+    data:date

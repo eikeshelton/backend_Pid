@@ -12,10 +12,12 @@ from controllers.chat.chat_controller import *
 from controllers.parceiro_treino.cadastro_parceiro_treino_controller import *
 from controllers.parceiro_treino.busca_parceiro_treino_controller import *
 from controllers.seguidores_seguidos.seguidores_seguidos import *
+from controllers.refeicao.refeicoes import *
+from controllers.alimento.alimentos import *
 from controllers.guias.guias import *
 from dependencies import get_db
 from typing import Dict
-from models.schema.schema import *
+from models.schema.schema import*
 import json
 from starlette.websockets import WebSocketState
 app = FastAPI()
@@ -41,6 +43,10 @@ def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
 
     usuario = obter_dados_usuario(email, db)
     return usuario
+
+@app.get("/contar_seguidores_seguidos/{id_usuario}")
+def contar_seguidores_seguidos(id_usuario:int,db:Session= Depends(get_db)):
+    contar_seguidores_e_seguidos(id_usuario, db)
     
 @app.post("/check-credentials/")
 def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depends(get_db)):
@@ -214,28 +220,27 @@ def conversas_usuario(id_usuario:int,db:Session=Depends(get_db)):
     conversas_usuario=conversas_chat(id_usuario,db)
     return conversas_usuario
 
-#lista de todas as solicitaçoes pendentes do usuario
-@app.get("/lista_solicitacoes_pendentes/{id_usuario}")
-def lista_solicitacoes(id_usuario,db:Session=Depends(get_db)):
-    lista = solicitacoes(id_usuario,db)
-    return lista
+@app.get("/buscar/id/refeicao")
+def end_point_buscar_id_refeicao(db:Session=Depends(get_db)):
+    buscar_id_refeicao=db.query(Refeicao).all()
+    return buscar_id_refeicao
+@app.post("/refeicoes/alimentos/")
+def adicionar_alimentos_endpoint(alimento:AlimentoSchema, db: Session = Depends(get_db)):
+    return adicionar_alimentos(alimento, db)
 
-@app.post("/seguidores/acao/")
-def seguimento(seguidores: SeguidoresAcao, db: Session = Depends(get_db)):
-    relacao= acao_seguir(seguidores,db)
-    return relacao
+@app.get("/refeicoes/{usuario_id}/{data}")
+def listar_refeicoes_endpoint(usuario_id: int,data:date, db: Session = Depends(get_db)):
+    return listar_refeicoes(usuario_id,data, db)
 
-@app.post("/guias/")
-def create_guia(guia: GuiaCreate, db: Session = Depends(get_db)):
-    guia =cadastrar_guia(guia,db)
-    return guia
-@app.get("/buscar/capas/guias/{id_usuario}")
-def read_guias(id_usuario, db: Session = Depends(get_db))-> List[GuiaResponse]:
-    guias =buscar_capas_guias(id_usuario,db)
-    return guias
 
-@app.get("buscar/guia/{id_guia}")
-def endpont_buscar_guia_id(id_guia,db:Session= Depends(get_db)):
-    guia = busca_guia_id(id_guia,db)
-    return guia
+@app.get("/alimentos/{descricao}", response_model=List[AlimentoResponse])
+def obter_alimento_endpoint(descricao: str, db: Session = Depends(get_db)):
+    return obter_alimento(descricao, db)
 
+app.get("/buscar/info/alimento")
+def end_point_buscar_id_refeicao(db:Session=Depends(get_db)):
+    buscar_id_refeicao=db.query(Refeicao).all()
+    return buscar_id_refeicao
+@app.post("/buscar/info/alimento")
+def endpoint_buscar_info_alimento(buscarAlimento:BuscaAlimento,db: Session = Depends(get_db)):
+    return buscar_info_alimento(buscarAlimento,db)
