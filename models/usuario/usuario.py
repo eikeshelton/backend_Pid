@@ -16,6 +16,7 @@ class Usuario(Base):
     bio = Column(String)
     seguidores = Column(Integer, default=0)
     seguidos = Column(Integer, default=0)
+    publicacoes = Column(Integer, default=0)
     token_reset_senha = Column(String)
     sexo = Column(String(50))
     fcm_token = Column(String, nullable=True)  

@@ -23,7 +23,7 @@ def adicionar_alimentos(alimento:AlimentoSchema, db: Session):
         id_refeicao= alimento.refeicao_id,
         id_usuario=alimento.id_usuario,
         id_alimento=alimento_usuario.id,
-        data = date.today()
+        data = alimento.data
     )
 
     db.add(refeicoes_alimento)

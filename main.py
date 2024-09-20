@@ -38,10 +38,9 @@ def atualizar_dados_usuario(email: str, usuario_update: UsuarioUpdate, db: Sessi
     return atualizar_usuario(db, email, usuario_update)
 
 # Rota para atualizar o usuario
-@app.get("/usuarios/{email}")
-def obter_dados_usuario_view(email: str, db: Session = Depends(get_db)):
-
-    usuario = obter_dados_usuario(email, db)
+@app.get("/usuarios/{id_usuario}")
+def obter_dados_usuario_view(id_usuario: int, db: Session = Depends(get_db)):
+    usuario = obter_dados_usuario(id_usuario, db)
     return usuario
 
 @app.get("/contar_seguidores_seguidos/{id_usuario}")
@@ -209,6 +208,11 @@ def cancelar_seguidor(seguidores: SeguidoresCreate, db: Session = Depends(get_db
 def seguidores_seguidos(id_usuario:int,db:Session=Depends(get_db)):
     usuario=buscar_seguidores_seguidos(id_usuario,db)
     return usuario
+#lista de todas as solicitaçoes pendentes do usuario
+@app.get("/lista_solicitacoes_pendentes/{id_usuario}")
+def lista_solicitacoes(id_usuario,db:Session=Depends(get_db)):
+    lista = solicitacoes(id_usuario,db)
+    return lista
 
 # receber token do celular para notificaçao
 @app.post("/atualizar-fcm-token/")
@@ -252,10 +256,5 @@ def endpoint_cadastrar_guia(guia:GuiaCreate,db: Session = Depends(get_db)):
 def endpoint_buscar_capa_guias(id_usuario:int,db:Session = Depends(get_db)):
     return buscar_capas_guias(id_usuario,db)
 
-@app.get("/buscar/guias/id/{id_guia}")
-def endpoint_buscar_capa_guias(id_guia:int,db:Session = Depends(get_db)):
-    return busca_guia_id(id_guia,db)
 
-@app.post("/cadastrar/guia/teste")
-def endpoint_cadastrar_guia(guia:GuiaCreateteste,db: Session = Depends(get_db)):
-    return cadastrar_guia_teste(guia,db)
+

@@ -2,6 +2,7 @@ import bcrypt
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from models.usuario.usuario import Usuario
+from controllers.guias.guias import contar_capas_guias
 
 
 
@@ -18,9 +19,10 @@ def atualizar_usuario(db: Session, email: str, usuario_update):
     else:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-def obter_dados_usuario(email: str, db: Session):
+def obter_dados_usuario(id_usuario: int, db: Session):
+    contar_capas_guias(id_usuario,db)
     # Buscar o usuário com o login fornecido
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    usuario = db.query(Usuario).filter(Usuario.id == id_usuario).first()
     
     # Verificar se o usuário existe
     if usuario is None:
