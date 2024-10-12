@@ -1,5 +1,5 @@
 # models/usuario.py
-from sqlalchemy import Column, String, Date, BINARY, Integer
+from sqlalchemy import Column, String, Date,Integer,ForeignKey
 from sqlalchemy.orm import relationship
 from models.aadeclarative_base import Base
 class Usuario(Base):
@@ -10,7 +10,7 @@ class Usuario(Base):
     nome_usuario = Column(String)
     login = Column(String)
     senha = Column(String)
-    tipo_usuario = Column(String)
+    tipo_usuario_id = Column(Integer, ForeignKey("tipo_usuario.id"))
     data_nascimento = Column(Date)
     foto_perfil = Column(String)
     bio = Column(String)
@@ -22,4 +22,10 @@ class Usuario(Base):
     fcm_token = Column(String, nullable=True)  
     pesquisas = relationship("HistoricoPesquisa", back_populates="usuario", foreign_keys="HistoricoPesquisa.usuario_id")
     pesquisas_pesquisado = relationship("HistoricoPesquisa", back_populates="pesquisado", foreign_keys="HistoricoPesquisa.pesquisado_id")
+    tipo_usuario = relationship("TipoUsuario", back_populates="usuarios")
 
+class TipoUsuario(Base):
+    __tablename__ = "tipo_usuario"
+    id = Column(Integer, primary_key=True)
+    tipo= Column(String)
+    usuarios = relationship("Usuario", back_populates="tipo_usuario")

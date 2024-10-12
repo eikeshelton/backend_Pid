@@ -1,7 +1,7 @@
-from sqlalchemy import Column, INTEGER, ForeignKey, DateTime
+from sqlalchemy import Column, INTEGER, ForeignKey
 from sqlalchemy.orm import relationship
 from models.aadeclarative_base import Base
-from datetime import datetime, timezone
+
 
 class HistoricoPesquisa(Base):
     __tablename__ = 'historico_pesquisa'

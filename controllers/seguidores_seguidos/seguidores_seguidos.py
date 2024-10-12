@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from models.seguidores_seguidos.seguidores_seguidos import SeguidoresSeguidos
 from models.usuario.usuario import Usuario
 from sqlalchemy import  and_,func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 def registrar_seguidores(seguidores, db: Session):
     relacao_existente = db.query(SeguidoresSeguidos).filter(
         and_(
@@ -102,9 +102,12 @@ def lista_usuarios_seguidos(id_usuario: int, db: Session):
     ids_seguidos = [id_[0] for id_ in ids_seguidos]
 
     # Consulta para obter informações dos usuários seguidos
-    usuarios_seguidos = db.query(Usuario).filter(
-        Usuario.id.in_(ids_seguidos)
-    ).all()
+    usuarios_seguidos = (
+        db.query(Usuario)
+        .options(joinedload(Usuario.tipo_usuario))  # Carrega a relação com tipo_usuario
+        .filter(Usuario.id.in_(ids_seguidos))
+        .all()
+    )
 
     # Formatação dos dados para retorno
     lista_usuarios = []
@@ -113,33 +116,38 @@ def lista_usuarios_seguidos(id_usuario: int, db: Session):
             "id_usuario": usuario.id,
             "nome_usuario": usuario.nome_usuario,
             "foto_perfil": usuario.foto_perfil,
-            "tipo_usuario": usuario.tipo_usuario
+            "tipo_usuario": usuario.tipo_usuario.tipo
         })
 
     return lista_usuarios
 
 def lista_usuarios_seguidores(id_usuario: int, db: Session):
+    # Consulta para obter os IDs dos seguidores
     ids_seguidores = db.query(SeguidoresSeguidos.id_seguidor).filter(
-    SeguidoresSeguidos.id_seguido == id_usuario
+        SeguidoresSeguidos.id_seguido == id_usuario
     ).all()
     
     # Extrai os IDs em uma lista simples
     ids_seguidores = [id_[0] for id_ in ids_seguidores]
 
-    # Consulta para obter informações dos usuários seguidos
-    usuarios_seguidos = db.query(Usuario).filter(
-        Usuario.id.in_(ids_seguidores)
-    ).all()
+    # Consulta para obter informações dos usuários seguidores, incluindo o tipo de usuário
+    usuarios_seguidores = (
+        db.query(Usuario)
+        .options(joinedload(Usuario.tipo_usuario))  # Carrega a relação com tipo_usuario
+        .filter(Usuario.id.in_(ids_seguidores))
+        .all()
+    )
 
     # Formatação dos dados para retorno
-    lista_usuarios = []
-    for usuario in usuarios_seguidos:
-        lista_usuarios.append({
+    lista_usuarios = [
+        {
             "id_usuario": usuario.id,
             "nome_usuario": usuario.nome_usuario,
             "foto_perfil": usuario.foto_perfil,
-            "tipo_usuario": usuario.tipo_usuario
-        })
+            "tipo_usuario": usuario.tipo_usuario.tipo  # Acesso à descrição do tipo
+        }
+        for usuario in usuarios_seguidores
+    ]
 
     return lista_usuarios
 

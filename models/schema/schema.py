@@ -178,3 +178,11 @@ class RefeicaoResponseList(BaseModel):
 class BuscaAlimento(BaseModel):
     id_usuario:int
     data:date
+
+class CadastrarEvento(BaseModel):
+    organizador_id:int
+    nome:str
+    descricao:Optional[str] = None
+    data_inicio: date
+    hora_inicio: time
+    localizacao : str
