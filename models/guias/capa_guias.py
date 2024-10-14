@@ -15,7 +15,7 @@ class Guia(Base):
     __tablename__ = "guia"
     
     id = Column(Integer, primary_key=True, index=True)
-    id_capa_guia = Column(Integer, ForeignKey("capa_guias.id_guias"))  # Relacionamento correto
+    id_guia = Column(Integer, ForeignKey("capa_guias.id_guias"))  # Relacionamento correto
     id_usuario = Column(Integer)
     foto_guia = Column(String)
     titulo_guia = Column(String)
