@@ -186,3 +186,55 @@ class CadastrarEvento(BaseModel):
     data_inicio: date
     hora_inicio: time
     localizacao : str
+
+# Schema de entrada para criação de um novo treinamento
+class TreinamentoCreate(BaseModel):
+    nome: str
+    descricao: Optional[str] = None
+    is_publico: Optional[bool] = False  # Para indicar se o treinamento é público
+
+    class Config:
+        orm_mode = True
+
+# Schema de saída para visualização dos dados do treinamento
+class Treinamento(BaseModel):
+    id: int
+    nome: str
+    descricao: Optional[str]
+    is_publico: bool
+
+    class Config:
+        orm_mode = True
+        
+# Schema para visualização de um treinamento armazenado no banco de dados
+class Treinamento(Treinamento):
+    id: int
+    exercicios: List[int]  # Lista de IDs de exercícios
+
+    class Config:
+        orm_mode = True
+
+class ExercicioPersonalizadoBase(BaseModel):
+    treinamento_id: int
+    api_exercicio_id: int
+    nome_exercicio: str
+    notas: Optional[str] = None
+    repeticoes: Optional[int] = None
+    series: Optional[int] = None
+    carga_kg: Optional[int] = None
+    tempo_descanso_seg: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+class ExercicioPersonalizadoCreate(ExercicioPersonalizadoBase):
+    pass  
+
+class ExercicioPersonalizadoUpdate(ExercicioPersonalizadoBase):
+    pass  
+
+class ExercicioPersonalizado(ExercicioPersonalizadoBase):
+    id: int
+
+    class Config:
+        orm_mode = True

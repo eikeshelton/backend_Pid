@@ -22,7 +22,8 @@ class Usuario(Base):
     fcm_token = Column(String, nullable=True)  
     pesquisas = relationship("HistoricoPesquisa", back_populates="usuario", foreign_keys="HistoricoPesquisa.usuario_id")
     pesquisas_pesquisado = relationship("HistoricoPesquisa", back_populates="pesquisado", foreign_keys="HistoricoPesquisa.pesquisado_id")
-    tipo_usuario = relationship("TipoUsuario", back_populates="usuarios")
+    tipo_usuario = relationship("TipoUsuario", back_populates="usuario")
+    treinamentos = relationship("Treinamento", back_populates="usuario")
 
 class TipoUsuario(Base):
     __tablename__ = "tipo_usuario"
