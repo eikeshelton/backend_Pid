@@ -15,13 +15,21 @@ from controllers.seguidores_seguidos.seguidores_seguidos import *
 from controllers.refeicao.refeicoes import *
 from controllers.alimento.alimentos import *
 from controllers.guias.guias import *
+from controllers.eventos.eventos import *
 from dependencies import get_db
 from typing import Dict
 from models.schema.schema import*
 import json
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Pode ser ajustado para permitir apenas origens específicas
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 connections: Dict[int, WebSocket] = {}
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -102,10 +110,7 @@ def buscar_usuarios_filtro(usersearchtype:UserSearchType, db:Session=Depends(get
 @app.post("/usuarios/registra-buscar/")
 def buscar_usuarios(registrar_busca:RegistrarBusca,db: Session = Depends(get_db)):
     registrar_pesquisado(db, registrar_busca)
-    usuarios = buscar_pesquisado(db, registrar_busca.usuario_id)
-    if usuarios is None:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    return usuarios 
+    
 
 @app.get("/usuarios-pesquisados/{usuario_id}")
 def pesquisados(usuario_id,db: Session = Depends(get_db)):
@@ -263,5 +268,31 @@ def endpoint_buscar_id_guias(id_guia:int,db:Session = Depends(get_db)):
 def deletar_guia(id_guia: int, db: Session = Depends(get_db)):
     return deletar_guia_completo(id_guia, db)
 
+@app.post("/evento/cadastrar/")
+def Cadastrar_Evento_Endpoint(evento:CadastrarEvento,db: Session = Depends(get_db)):
+    return cadastrar_evento(evento,db)
+
+@app.get("/buscar/eventos/{municipio_id}/{usuario_id}")
+def Buscar_Eventos_Endpoint(municipio_id:int,usuario_id:int,db: Session = Depends(get_db)):
+    return buscar_eventos(municipio_id,usuario_id,db)
+
+@app.get("/atualizar/quantidades/participantes/{evento_id}")
+def Atualizar_Quantidade_Participantes_Endpoint(evento_id,db: Session = Depends(get_db)):
+    atualizar_quantidade_participantes(evento_id,db)
 
 
+@app.get("/cadastrar/usuario/evento/{evento_id}/{participante_id}")
+def Cadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
+    cadastrar_usuario_evento(evento_id,participante_id,db)
+@app.get("/descadastrar/usuario/evento/{evento_id}/{participante_id}")
+def Descadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
+    descadastrar_usuario_evento(evento_id,participante_id,db)
+
+
+@app.patch("/eventos/{evento_id}/interesse")
+def Atualizar_Interesse_Evento_Endpoint(evento_id: int,interesse: InteresseEvento,db:Session = Depends(get_db)):
+    return atualizar_interesse_evento(evento_id,interesse,db)
+
+@app.get("/lista/participantes/evento/{evento_id}")
+def  Lista_Participantes_Evento_Endpoint(evento_id:int,db:Session = Depends(get_db)):
+    return listar_participantes_evento(evento_id,db)

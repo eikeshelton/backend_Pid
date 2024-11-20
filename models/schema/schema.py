@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date,datetime,time
-from typing import List, Optional
+from typing import Optional
+
 #classe abstrata 
 class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
@@ -142,7 +143,7 @@ class AlimentoResponse(AlimentoBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RefeicaoBase(BaseModel):
     nome: str
@@ -180,9 +181,25 @@ class BuscaAlimento(BaseModel):
     data:date
 
 class CadastrarEvento(BaseModel):
+    id:Optional[int]
     organizador_id:int
     nome:str
     descricao:Optional[str] = None
     data_inicio: date
     hora_inicio: time
     localizacao : str
+    municipio_id:int
+    quantidade_participantes: Optional[int] = 0
+
+
+class EventoResponse(BaseModel):
+    id: int
+    nome: str
+    quantidade_participantes: int
+    interesse_declarado: bool
+
+    class Config:
+        from_attributes = True
+class InteresseEvento(BaseModel):
+    participante_id: int
+    interesse_declarado: bool
