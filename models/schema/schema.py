@@ -63,7 +63,7 @@ class Mensagem(BaseModel):
     id_conversa:int
 
 
-class ParceiroTreino(BaseModel):
+class ParceiroTreinoSchema(BaseModel):
     id_usuario: Optional[int] = None
     modalidade: str
     estado_codigo_ibge: int
@@ -78,7 +78,7 @@ class ParceiroTreino(BaseModel):
     datetime_registro: Optional[datetime] = None
     
 
-class ParceiroTreinoResponse(ParceiroTreino):
+class ParceiroTreinoResponse(ParceiroTreinoSchema):
     id: int
     nome_usuario: str
     foto_perfil: Optional[str] = None

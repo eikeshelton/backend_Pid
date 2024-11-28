@@ -9,14 +9,28 @@ from typing import List
 from models.schema.schema import ParceiroTreinoResponse
 
 def buscar_parceiros_treino(db: Session, filtros) -> List[ParceiroTreinoResponse]:
+    # Verifica se o estado existe no banco
     estado_id = get_estado_id(db, filtros.estado_codigo_ibge)
+    if not estado_id:
+        raise HTTPException(status_code=404, detail="Estado não encontrado com o código IBGE fornecido.")
+    
+    # Verifica se o município existe no banco
     municipio_id = get_municipio_id(db, filtros.municipio_codigo_ibge, filtros.estado_codigo_ibge)
-    data_limite = datetime.now(timezone.utc) - timedelta(days=7)
+    if not municipio_id:
+        raise HTTPException(status_code=404, detail="Município não encontrado com o código IBGE fornecido.")
+    
+    # Verifica se a modalidade existe no banco
+    
+    if not db.query(ParceiroTreino).filter(ParceiroTreino.modalidade == filtros.modalidade).first():
+        raise HTTPException(status_code=404, detail="Não há parceiros de treino para essa modalidade.")
+    
+    data_limite = datetime.now(timezone.utc) - timedelta(days=100)
     
     try:
+        # Monta a consulta com os filtros obrigatórios
         query = db.query(
-            ParceiroTreino, Usuario.nome_usuario, Usuario.foto_perfil, Usuario.sexo,Usuario.seguidos,
-            Usuario.seguidores,Usuario.bio,Usuario.login
+            ParceiroTreino, Usuario.nome_usuario, Usuario.foto_perfil, Usuario.sexo, Usuario.seguidos,
+            Usuario.seguidores, Usuario.bio, Usuario.login
         ).join(
             Usuario, ParceiroTreino.id_usuario == Usuario.id
         ).filter(
@@ -41,14 +55,14 @@ def buscar_parceiros_treino(db: Session, filtros) -> List[ParceiroTreinoResponse
             query = query.filter(Usuario.sexo == filtros.sexo)
 
         parceiros = []
-        for parceiro_treino, nome, foto_perfil, sexo, seguindo, seguidores, bio,login in query.all():
+        for parceiro_treino, nome, foto_perfil, sexo, seguindo, seguidores, bio, login in query.all():
             local = parceiro_treino.local if parceiro_treino.local else ""
             horario = parceiro_treino.horario.strftime('%H:%M') if parceiro_treino.horario else ""
             sexo_usuario = sexo if sexo else ""
             
             parceiro = ParceiroTreinoResponse(
                 id=parceiro_treino.id,
-                id_usuario= parceiro_treino.id_usuario,
+                id_usuario=parceiro_treino.id_usuario,
                 modalidade=parceiro_treino.modalidade,
                 estado_codigo_ibge=parceiro_treino.estado_codigo_ibge,
                 municipio_codigo_ibge=parceiro_treino.municipio_codigo_ibge,
