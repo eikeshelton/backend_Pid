@@ -60,7 +60,7 @@ def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depen
     
     # Chama a função verificar_credenciais para obter o ID do usuário
     usuario = verificar_credenciais(db, credenciais.email, credenciais.senha)
-    # Retorna o ID do usuário
+
     return usuario
     
 @app.put("/Uploadlogin/")
