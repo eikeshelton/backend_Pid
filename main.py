@@ -172,12 +172,12 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, user_id2: int, 
                 del connections[(user_id, user_id2)]
 #Endpoint do cadastro de preferências do Parceiro de Treino
 @app.post("/parceiros_treino/cadastro")
-def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Session = Depends(get_db)):
+def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreinoSchema, db: Session = Depends(get_db)):
     return cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
 
 #Endpoint da busca pelo Parceiro de Treino, com os filtros definidos.
 @app.post("/parceiros_treino/busca")
-def buscar_parceiros_treino_endpoint(filtros: ParceiroTreino, db: Session = Depends(get_db)):
+def buscar_parceiros_treino_endpoint(filtros: ParceiroTreinoSchema, db: Session = Depends(get_db)):
     parceiros = buscar_parceiros_treino(db, filtros)
     if not parceiros:
         raise HTTPException(status_code=404, detail="Nenhum parceiro de treino encontrado com os filtros fornecidos")
