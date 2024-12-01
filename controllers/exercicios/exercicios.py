@@ -16,7 +16,7 @@ def buscar_exercicios_banco(db: Session):
     return db.query(ExercicioPersonalizado).all()
 
 # Função para buscar dados do exercício por nome
-def buscar_exercicios_por_nome(nome_exercicio: str, db: Session):
+def buscar_exercicios_por_nome(db: Session, nome_exercicio: str):
     exercicios = db.query(ExercicioPersonalizado).filter(
         ExercicioPersonalizado.nome_exercicio.ilike(f"%{nome_exercicio}%")
     ).all()

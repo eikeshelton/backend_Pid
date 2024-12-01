@@ -280,7 +280,8 @@ def buscar_treinamento_banco_endpoint(treinamento_id: int, db: Session = Depends
 def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
     return buscar_treinamentos_por_usuario(usuario_id, db)
 
-@app.put("/treinamentos/{treinamento_id}")
+#Endpoint pra atualizar treinamento
+@app.put("/treinamentos/{treinamento_id}", response_model=Treinamento)
 def editar_treinamento_endpoint(treinamento_id: int, treinamento: TreinamentoUpdate, db: Session = Depends(get_db)):
     return atualizar_treinamento(db, treinamento_id, treinamento)
 
@@ -299,10 +300,10 @@ def buscar_exercicio_banco_endpoint(exercicio_id: int, db: Session = Depends(get
 def buscar_exercicios_banco_endpoint(db: Session = Depends(get_db)):
     return buscar_exercicios_banco(db=db)
 
-# Endpoint para buscar um exercício específico na API externa
+# Endpoint para buscar um exercício específico no banco
 @app.get("/exercicio_api/{exercicio_name}", response_model=ExercicioPersonalizado)
 def buscar_exercicio_nome(nome_exercicio: str, db: Session = Depends(get_db)):
-    return buscar_exercicios_por_nome(nome_exercicio=nome_exercicio)
+    return buscar_exercicios_por_nome(db=db, nome_exercicio=nome_exercicio)
 
 # Endpoint para buscar todos os exercícios na API externa
 @app.get("/exercicios_api", response_model=list[ExercicioPersonalizado])
