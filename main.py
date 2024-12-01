@@ -301,7 +301,7 @@ def buscar_exercicios_banco_endpoint(db: Session = Depends(get_db)):
     return buscar_exercicios_banco(db=db)
 
 # Endpoint para buscar um exercício específico no banco
-@app.get("/exercicio_api/{exercicio_name}", response_model=ExercicioPersonalizado)
+@app.get("/exercicio_api/{exercicio_name}", response_model=Exercicio)
 def buscar_exercicio_nome(nome_exercicio: str, db: Session = Depends(get_db)):
     return buscar_exercicios_por_nome(db=db, nome_exercicio=nome_exercicio)
 
