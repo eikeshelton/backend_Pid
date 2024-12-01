@@ -262,7 +262,7 @@ def endpoint_buscar_capa_guias(id_usuario:int,db:Session = Depends(get_db)):
 
 # Endpoint para criar um novo treinamento no banco de dados
 @app.post("/treinamento", response_model=Treinamento)
-def criar_treinamento_endpoint(treinamento: TreinamentoCreate, db: Session = Depends(get_db), usuario_id: int = Depends(get_usuario_id)):
+def criar_treinamento_endpoint(treinamento: TreinamentoCreate, usuario_id: int, db: Session = Depends(get_db)):
     return criar_treinamento(db=db, treinamento=treinamento, usuario_id=usuario_id)
 
 # Endpoint para excluir um treinamento do banco de dados
