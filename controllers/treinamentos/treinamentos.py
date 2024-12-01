@@ -39,6 +39,7 @@ def atualizar_treinamento(db: Session, treinamento_id: int, treinamento):
     db.commit()
     db.refresh(db_treinamento)
     return db_treinamento
+
 # Função para buscar todos os treinamentos no banco de dados
 def buscar_treinamentos_banco(db: Session):
     return db.query(ModeloTreinamento).all()

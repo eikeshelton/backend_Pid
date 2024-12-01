@@ -215,6 +215,19 @@ class Treinamento(Treinamento):
     class Config:
         orm_mode = True
 
+class TreinamentoUpdate(BaseModel):
+    nome: Optional[str] = None
+    descricao: Optional[str] = None
+    dia_da_semana: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+class ExercicioBase(BaseModel):
+    id: int
+    nome: str
+    descricao: str
+
 class ExercicioPersonalizadoBase(BaseModel):
     treinamento_id: int
     api_exercicio_id: int
