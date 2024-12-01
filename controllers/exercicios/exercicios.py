@@ -1,6 +1,7 @@
 # controllers/exercicio_personalizado_controller.py
 from sqlalchemy.orm import Session
 from models.exercicio.exercicio_personalizado import ExercicioPersonalizado
+from models.exercicio.exercicio import Exercicio
 from fastapi import HTTPException
 import requests
 
@@ -17,8 +18,8 @@ def buscar_exercicios_banco(db: Session):
 
 # Função para buscar dados do exercício por nome
 def buscar_exercicios_por_nome(db: Session, nome_exercicio: str):
-    exercicios = db.query(ExercicioPersonalizado).filter(
-        ExercicioPersonalizado.nome_exercicio.ilike(f"%{nome_exercicio}%")
+    exercicios = db.query(Exercicio).filter(
+        Exercicio.nome_exercicio.ilike(f"%{nome_exercicio}%")
     ).all()
 
     if not exercicios:
