@@ -275,6 +275,15 @@ def excluir_treinamento_endpoint(treinamento_id: int, db: Session = Depends(get_
 def buscar_treinamento_banco_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
     return buscar_treinamento_banco(db=db, treinamento_id=treinamento_id)
 
+# Endpoint para buscar os treinamentos de um usuário
+@app.get("/treinamentos/{usuario_id}", response_model=list[Treinamento])
+def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
+    return buscar_treinamentos_por_usuario(usuario_id, db)
+
+@app.put("/treinamentos/{treinamento_id}")
+def editar_treinamento_endpoint(treinamento_id: int, treinamento: TreinamentoUpdate, db: Session = Depends(get_db)):
+    return atualizar_treinamento(db, treinamento_id, treinamento)
+
 # Endpoint para buscar todos os treinamentos no banco de dados
 @app.get("/treinamento/banco", response_model=list[Treinamento])
 def buscar_treinamentos_banco_endpoint(db: Session = Depends(get_db)):
@@ -291,9 +300,9 @@ def buscar_exercicios_banco_endpoint(db: Session = Depends(get_db)):
     return buscar_exercicios_banco(db=db)
 
 # Endpoint para buscar um exercício específico na API externa
-@app.get("/exercicio_api/{exercicio_id}", response_model=ExercicioPersonalizado)
-def buscar_exercicio_api_endpoint(exercicio_id: int):
-    return buscar_exercicio_api(exercicio_id=exercicio_id)
+@app.get("/exercicio_api/{exercicio_name}", response_model=ExercicioPersonalizado)
+def buscar_exercicio_nome(nome_exercicio: str, db: Session = Depends(get_db)):
+    return buscar_exercicios_por_nome(nome_exercicio=nome_exercicio)
 
 # Endpoint para buscar todos os exercícios na API externa
 @app.get("/exercicios_api", response_model=list[ExercicioPersonalizado])

@@ -201,6 +201,7 @@ class Treinamento(BaseModel):
     id: int
     nome: str
     descricao: Optional[str]
+    dia_da_semana: Optional[str]
     is_publico: bool
 
     class Config:

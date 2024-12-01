@@ -15,13 +15,16 @@ def buscar_exercicio_banco(db: Session, exercicio_id: int):
 def buscar_exercicios_banco(db: Session):
     return db.query(ExercicioPersonalizado).all()
 
-# Função para buscar dados do exercício na API externa
-def buscar_exercicio_api(exercicio_id: int):
-    url = f"https://wger.de/api/v2/exercise/{exercicio_id}/"  # Alterar conforme necessário para a API
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="Exercício não encontrado na API externa")
-    return response.json()
+# Função para buscar dados do exercício por nome
+def buscar_exercicios_por_nome(nome_exercicio: str, db: Session):
+    exercicios = db.query(ExercicioPersonalizado).filter(
+        ExercicioPersonalizado.nome_exercicio.ilike(f"%{nome_exercicio}%")
+    ).all()
+
+    if not exercicios:
+        raise HTTPException(status_code=404, detail="Nenhum exercício encontrado com esse nome")
+
+    return exercicios
 
 # Função para buscar todos os exercícios na API externa
 def buscar_exercicios_api():
