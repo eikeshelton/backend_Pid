@@ -336,3 +336,76 @@ def Atualizar_Interesse_Evento_Endpoint(evento_id: int,interesse: InteresseEvent
 @app.get("/lista/participantes/evento/{evento_id}")
 def  Lista_Participantes_Evento_Endpoint(evento_id:int,db:Session = Depends(get_db)):
     return listar_participantes_evento(evento_id,db)
+
+@app.post("/cadastrar/guia")
+def endpoint_cadastrar_guia(guia:GuiaCreate,db: Session = Depends(get_db)):
+    return cadastrar_guia(guia,db)
+
+@app.get("/buscar/capas/guias/{id_usuario}")
+def endpoint_buscar_capa_guias(id_usuario:int,db:Session = Depends(get_db)):
+    return buscar_capas_guias(id_usuario,db)
+
+# Endpoint para criar um novo treinamento no banco de dados
+@app.post("/treinamento/{id_usuario}", response_model=Treinamento)
+def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
+    return criar_treinamento(db=db, treinamento=treinamento, id_usuario=id_usuario)
+
+# Endpoint para excluir um treinamento do banco de dados
+@app.delete("/treinamento/{treinamento_id}", response_model=Treinamento)
+def excluir_treinamento_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
+    return excluir_treinamento(db=db, treinamento_id=treinamento_id)
+
+# Endpoint para buscar um treinamento específico no banco de dados
+@app.get("/treinamento/banco/{treinamento_id}", response_model=Treinamento)
+def buscar_treinamento_banco_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
+    return buscar_treinamento_banco(db=db, treinamento_id=treinamento_id)
+
+# Endpoint para buscar os treinamentos de um usuário
+@app.get("/treinamentos/{usuario_id}", response_model=list[Treinamento])
+def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
+    return buscar_treinamentos_por_usuario(usuario_id, db)
+
+#Endpoint pra atualizar treinamento
+@app.put("/treinamentos/{treinamento_id}", response_model=Treinamento)
+def editar_treinamento_endpoint(treinamento_id: int, treinamento: TreinamentoUpdate, db: Session = Depends(get_db)):
+    return atualizar_treinamento(db, treinamento_id, treinamento)
+
+# Endpoint para buscar todos os treinamentos no banco de dados
+@app.get("/treinamento/banco", response_model=list[Treinamento])
+def buscar_treinamentos_banco_endpoint(db: Session = Depends(get_db)):
+    return buscar_treinamentos_banco(db=db)
+
+# Endpoint para buscar um exercício específico no banco de dados
+@app.get("/busca_exercicio/{exercicio_id}", response_model=ExercicioPersonalizado)
+def buscar_exercicio_banco_endpoint(exercicio_id: int, db: Session = Depends(get_db)):
+    return buscar_exercicio_banco(db=db, exercicio_id=exercicio_id)
+
+# Endpoint para buscar todos os exercícios no banco de dados
+@app.get("/busca_all_exercicio", response_model=list[ExercicioPersonalizado])
+def buscar_exercicios_banco_endpoint(db: Session = Depends(get_db)):
+    return buscar_exercicios_banco(db=db)
+
+# Endpoint para buscar um exercício específico no banco
+@app.get("/exercicio_api/{exercicio_name}", response_model=ExercicioPersonalizado)
+def buscar_exercicio_nome(nome_exercicio: str, db: Session = Depends(get_db)):
+    return buscar_exercicios_por_nome(db=db, nome_exercicio=nome_exercicio)
+
+# Endpoint para buscar todos os exercícios na API externa
+@app.get("/exercicios_api", response_model=list[ExercicioPersonalizado])
+def buscar_exercicios_api_endpoint():
+    return buscar_exercicios_api()
+
+# Endpoint para criar um exercício personalizado
+@app.post("/", response_model=ExercicioPersonalizado)
+def criar_exercicio(exercicio: ExercicioPersonalizadoCreate, db: Session = Depends(get_db)):
+    return criar_exercicio_personalizado(db=db, exercicio=exercicio)
+
+# Endpoint para atualizar um exercício personalizado
+@app.put("/{exercicio_id}", response_model=ExercicioPersonalizado)
+def atualizar_exercicio(exercicio_id: int, exercicio: ExercicioPersonalizadoUpdate, db: Session = Depends(get_db)):
+    return atualizar_exercicio_personalizado(db=db, exercicio_id=exercicio_id, exercicio=exercicio)
+
+# Endpoint para deletar um exercício personalizado
+@app.delete("/{exercicio_id}")
+def deletar_exercicio(exercicio_id: int, db: Session = Depends(get_db)):
+    return deletar_exercicio_personalizado(db=db, exercicio_id=exercicio_id)
