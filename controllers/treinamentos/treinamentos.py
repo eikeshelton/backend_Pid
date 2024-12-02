@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from models.treinamento.treinamento import Treinamento as ModeloTreinamento  # Assumindo que a model do treinamento está em models/treinamento
 from models.schema.schema import TreinamentoCreate  # Schema de entrada para criação de treinamento
 from models.exercicio.exercicio_personalizado import ExercicioPersonalizado  # Para acessar os exercícios do banco de dados
+from controllers.exercicios.exercicios import criar_exercicio_personalizado
 
 # Função para buscar um treinamento específico no banco de dados
 def buscar_treinamento_banco(db: Session, treinamento_id: int):
@@ -45,16 +46,34 @@ def buscar_treinamentos_banco(db: Session):
     return db.query(ModeloTreinamento).all()
 
 # Função para criar um novo treinamento no banco de dados
-def criar_treinamento(db: Session, treinamento: TreinamentoCreate, usuario_id: int):
+def criar_treinamento(db: Session, treinamento: TreinamentoCreate):
+    # Criar o treinamento
     db_treinamento = ModeloTreinamento(
         nome=treinamento.nome,
+        usuario_id=treinamento.usuario_id,
         descricao=treinamento.descricao,
-        is_publico=treinamento.is_publico,
-        usuario_id=usuario_id 
+        dia_semana=treinamento.dia_da_semana
     )
     db.add(db_treinamento)
     db.commit()
     db.refresh(db_treinamento)
+
+    # Criar os exercícios personalizados associados
+    for exercicio in treinamento.exercicios:
+        criar_exercicio_personalizado(
+            db=db,
+            exercicio={
+                "treinamento_id": db_treinamento.id,
+                "api_exercicio_id": exercicio.api_exercicio_id,  # Se não existir integração, pode ser None
+                "nome_exercicio": exercicio.nome,
+                "notas": exercicio.notas,  # Pode ser adicionado se necessário
+                "repeticoes": exercicio.repeticoes,
+                "series": exercicio.series,
+                "carga_kg": exercicio.carga,
+                "tempo_descanso_seg": exercicio.tempoDescanso
+            }
+        )
+
     return db_treinamento
 
 # Função para excluir um treinamento no banco de dados

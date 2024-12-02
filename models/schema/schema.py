@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import date,datetime,time
 from typing import List, Optional
 #classe abstrata 
@@ -208,9 +208,12 @@ class Treinamento(BaseModel):
         orm_mode = True
         
 # Schema para visualização de um treinamento armazenado no banco de dados
-class Treinamento(Treinamento):
-    id: int
-    exercicios: List[int]  # Lista de IDs de exercícios
+class TreinamentoCreate(BaseModel):
+    nome: str
+    usuario_id: int
+    descricao: Optional[str] = None
+    dia_da_semana: Optional[str] = None
+    exercicios: List[int] = Field(min_items=1, description="Lista de IDs de exercícios")
 
     class Config:
         orm_mode = True
@@ -230,7 +233,7 @@ class ExercicioBase(BaseModel):
 
 class ExercicioPersonalizadoBase(BaseModel):
     treinamento_id: int
-    api_exercicio_id: int
+    api_exercicio_id: Optional[int]
     nome_exercicio: str
     notas: Optional[str] = None
     repeticoes: Optional[int] = None
