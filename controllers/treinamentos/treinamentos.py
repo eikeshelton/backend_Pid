@@ -76,6 +76,24 @@ def criar_treinamento(db: Session, treinamento: TreinamentoCreate):
 
     return db_treinamento
 
+    # Criar os exercícios personalizados associados
+    for exercicio in treinamento.exercicios:
+        criar_exercicio_personalizado(
+            db=db,
+            exercicio={
+                "treinamento_id": db_treinamento.id,
+                "api_exercicio_id": exercicio.api_exercicio_id,  # Se não existir integração, pode ser None
+                "nome_exercicio": exercicio.nome,
+                "notas": exercicio.notas,  # Pode ser adicionado se necessário
+                "repeticoes": exercicio.repeticoes,
+                "series": exercicio.series,
+                "carga_kg": exercicio.carga,
+                "tempo_descanso_seg": exercicio.tempoDescanso
+            }
+        )
+
+    return db_treinamento
+
 # Função para excluir um treinamento no banco de dados
 def excluir_treinamento(db: Session, treinamento_id: int):
     db_treinamento = db.query(ModeloTreinamento).filter(ModeloTreinamento.id == treinamento_id).first()
@@ -85,3 +103,4 @@ def excluir_treinamento(db: Session, treinamento_id: int):
     db.delete(db_treinamento)
     db.commit()
     return db_treinamento
+

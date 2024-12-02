@@ -1,5 +1,5 @@
 # models/exercicio_personalizado.py
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey
+from sqlalchemy import Column, Integer,Text,ForeignKey
 from sqlalchemy.orm import relationship
 from typing import Optional
 from models.aadeclarative_base import Base
@@ -15,5 +15,5 @@ class ExercicioPersonalizado(Base):
     carga_kg: Optional[int] = Column(Integer, default=None)
     tempo_descanso_seg: Optional[int] = Column(Integer, default=None)
 
-    exercicio = relationship('Exercicio', backref='exercicios_personalizados')
+    exercicio = relationship('Exercicio', back_populates='personalizar_exercicio')
     treinamento = relationship('Treinamento', back_populates='exercicios')

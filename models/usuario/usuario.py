@@ -28,7 +28,7 @@ class Usuario(Base):
     
     # Relacionamento com TipoUsuario
     tipo_usuario = relationship("TipoUsuario", back_populates="usuarios")
-
+    treinamentos = relationship("Treinamento", back_populates="usuario")
 class TipoUsuario(Base):
     __tablename__ = "tipo_usuario"
     id = Column(Integer, primary_key=True)
@@ -36,4 +36,4 @@ class TipoUsuario(Base):
     
     # Relacionamento com Usuario
     usuarios = relationship("Usuario", back_populates="tipo_usuario")
-    treinamentos = relationship("Treinamento", back_populates="usuario")
+    
