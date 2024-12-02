@@ -17,13 +17,21 @@ from controllers.alimento.alimentos import *
 from controllers.exercicios.exercicios import *
 from controllers.treinamentos.treinamentos import *
 from controllers.guias.guias import *
+from controllers.eventos.eventos import *
 from dependencies import get_db
 from typing import Dict
 from models.schema.schema import*
 import json
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Pode ser ajustado para permitir apenas origens específicas
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 connections: Dict[int, WebSocket] = {}
 @app.post("/usuarios/")
 def criar_novo_usuario(usuario_create: UsuarioCreate, db: Session = Depends(get_db)):
@@ -54,7 +62,7 @@ def verificar_credenciais_endpoint(credenciais: Credenciais, db: Session = Depen
     
     # Chama a função verificar_credenciais para obter o ID do usuário
     usuario = verificar_credenciais(db, credenciais.email, credenciais.senha)
-    # Retorna o ID do usuário
+
     return usuario
     
 @app.put("/Uploadlogin/")
@@ -104,10 +112,7 @@ def buscar_usuarios_filtro(usersearchtype:UserSearchType, db:Session=Depends(get
 @app.post("/usuarios/registra-buscar/")
 def buscar_usuarios(registrar_busca:RegistrarBusca,db: Session = Depends(get_db)):
     registrar_pesquisado(db, registrar_busca)
-    usuarios = buscar_pesquisado(db, registrar_busca.usuario_id)
-    if usuarios is None:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    return usuarios 
+    
 
 @app.get("/usuarios-pesquisados/{usuario_id}")
 def pesquisados(usuario_id,db: Session = Depends(get_db)):
@@ -169,12 +174,12 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, user_id2: int, 
                 del connections[(user_id, user_id2)]
 #Endpoint do cadastro de preferências do Parceiro de Treino
 @app.post("/parceiros_treino/cadastro")
-def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreino, db: Session = Depends(get_db)):
+def cadastra_preferencia_parceiro_treino(parceiro_treino: ParceiroTreinoSchema, db: Session = Depends(get_db)):
     return cadastrar_preferencia_parceiro_treino(db, parceiro_treino)
 
 #Endpoint da busca pelo Parceiro de Treino, com os filtros definidos.
 @app.post("/parceiros_treino/busca")
-def buscar_parceiros_treino_endpoint(filtros: ParceiroTreino, db: Session = Depends(get_db)):
+def buscar_parceiros_treino_endpoint(filtros: ParceiroTreinoSchema, db: Session = Depends(get_db)):
     parceiros = buscar_parceiros_treino(db, filtros)
     if not parceiros:
         raise HTTPException(status_code=404, detail="Nenhum parceiro de treino encontrado com os filtros fornecidos")
@@ -252,75 +257,82 @@ def end_point_buscar_id_refeicao(db:Session=Depends(get_db)):
 def endpoint_buscar_info_alimento(buscarAlimento:BuscaAlimento,db: Session = Depends(get_db)):
     return buscar_info_alimento(buscarAlimento,db)
 
-@app.post("/cadastrar/guia")
+@app.post("/cadastrar/guia/")
 def endpoint_cadastrar_guia(guia:GuiaCreate,db: Session = Depends(get_db)):
-    return cadastrar_guia(guia,db)
-
+    return cadastrar_guia_completo(guia,db)
 @app.get("/buscar/capas/guias/{id_usuario}")
 def endpoint_buscar_capa_guias(id_usuario:int,db:Session = Depends(get_db)):
     return buscar_capas_guias(id_usuario,db)
+@app.get("/buscar/guias/id/{id_guia}")
+def endpoint_buscar_id_guias(id_guia:int,db:Session = Depends(get_db)):
+    return busca_guia_id(id_guia,db)
 
-# Endpoint para criar um novo treinamento no banco de dados
-@app.post("/treinamento/{id_usuario}", response_model=Treinamento)
-def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
-    return criar_treinamento(db=db, treinamento=treinamento, id_usuario=id_usuario)
+@app.delete("/guia/{id_guia}")
+def deletar_guia(id_guia: int, db: Session = Depends(get_db)):
+    return deletar_guia_completo(id_guia, db)
 
-# Endpoint para excluir um treinamento do banco de dados
-@app.delete("/treinamento/{treinamento_id}", response_model=Treinamento)
-def excluir_treinamento_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
-    return excluir_treinamento(db=db, treinamento_id=treinamento_id)
+@app.post("/evento/cadastrar/")
+def Cadastrar_Evento_Endpoint(evento:CadastrarEvento,db: Session = Depends(get_db)):
+    return cadastrar_evento(evento,db)
 
-# Endpoint para buscar um treinamento específico no banco de dados
-@app.get("/treinamento/banco/{treinamento_id}", response_model=Treinamento)
-def buscar_treinamento_banco_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
-    return buscar_treinamento_banco(db=db, treinamento_id=treinamento_id)
+@app.get("/buscar/eventos/{municipio_id}/{usuario_id}")
+def Buscar_Eventos_Endpoint(municipio_id:int,usuario_id:int,db: Session = Depends(get_db)):
+    return buscar_eventos(municipio_id,usuario_id,db)
 
-# Endpoint para buscar os treinamentos de um usuário
-@app.get("/treinamentos/{usuario_id}", response_model=list[Treinamento])
-def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
-    return buscar_treinamentos_por_usuario(usuario_id, db)
+@app.get("/atualizar/quantidades/participantes/{evento_id}")
+def Atualizar_Quantidade_Participantes_Endpoint(evento_id,db: Session = Depends(get_db)):
+    atualizar_quantidade_participantes(evento_id,db)
 
-#Endpoint pra atualizar treinamento
-@app.put("/treinamentos/{treinamento_id}", response_model=Treinamento)
-def editar_treinamento_endpoint(treinamento_id: int, treinamento: TreinamentoUpdate, db: Session = Depends(get_db)):
-    return atualizar_treinamento(db, treinamento_id, treinamento)
 
-# Endpoint para buscar todos os treinamentos no banco de dados
-@app.get("/treinamento/banco", response_model=list[Treinamento])
-def buscar_treinamentos_banco_endpoint(db: Session = Depends(get_db)):
-    return buscar_treinamentos_banco(db=db)
+@app.get("/cadastrar/usuario/evento/{evento_id}/{participante_id}")
+def Cadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
+    cadastrar_usuario_evento(evento_id,participante_id,db)
+@app.get("/descadastrar/usuario/evento/{evento_id}/{participante_id}")
+def Descadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
+    descadastrar_usuario_evento(evento_id,participante_id,db)
 
-# Endpoint para buscar um exercício específico no banco de dados
-@app.get("/busca_exercicio/{exercicio_id}", response_model=ExercicioPersonalizado)
-def buscar_exercicio_banco_endpoint(exercicio_id: int, db: Session = Depends(get_db)):
-    return buscar_exercicio_banco(db=db, exercicio_id=exercicio_id)
 
-# Endpoint para buscar todos os exercícios no banco de dados
-@app.get("/busca_all_exercicio", response_model=list[ExercicioPersonalizado])
-def buscar_exercicios_banco_endpoint(db: Session = Depends(get_db)):
-    return buscar_exercicios_banco(db=db)
+@app.patch("/eventos/{evento_id}/interesse")
+def Atualizar_Interesse_Evento_Endpoint(evento_id: int,interesse: InteresseEvento,db:Session = Depends(get_db)):
+    return atualizar_interesse_evento(evento_id,interesse,db)
 
-# Endpoint para buscar um exercício específico no banco
-@app.get("/exercicio_api/{exercicio_name}", response_model=ExercicioPersonalizado)
-def buscar_exercicio_nome(nome_exercicio: str, db: Session = Depends(get_db)):
-    return buscar_exercicios_por_nome(db=db, nome_exercicio=nome_exercicio)
+@app.get("/lista/participantes/evento/{evento_id}")
+def  Lista_Participantes_Evento_Endpoint(evento_id:int,db:Session = Depends(get_db)):
+    return listar_participantes_evento(evento_id,db)
 
-# Endpoint para buscar todos os exercícios na API externa
-@app.get("/exercicios_api", response_model=list[ExercicioPersonalizado])
-def buscar_exercicios_api_endpoint():
-    return buscar_exercicios_api()
+@app.get("/buscar/guias/id/{id_guia}")
+def endpoint_buscar_id_guias(id_guia:int,db:Session = Depends(get_db)):
+    return busca_guia_id(id_guia,db)
 
-# Endpoint para criar um exercício personalizado
-@app.post("/", response_model=ExercicioPersonalizado)
-def criar_exercicio(exercicio: ExercicioPersonalizadoCreate, db: Session = Depends(get_db)):
-    return criar_exercicio_personalizado(db=db, exercicio=exercicio)
+@app.delete("/guia/{id_guia}")
+def deletar_guia(id_guia: int, db: Session = Depends(get_db)):
+    return deletar_guia_completo(id_guia, db)
 
-# Endpoint para atualizar um exercício personalizado
-@app.put("/{exercicio_id}", response_model=ExercicioPersonalizado)
-def atualizar_exercicio(exercicio_id: int, exercicio: ExercicioPersonalizadoUpdate, db: Session = Depends(get_db)):
-    return atualizar_exercicio_personalizado(db=db, exercicio_id=exercicio_id, exercicio=exercicio)
+@app.post("/evento/cadastrar/")
+def Cadastrar_Evento_Endpoint(evento:CadastrarEvento,db: Session = Depends(get_db)):
+    return cadastrar_evento(evento,db)
 
-# Endpoint para deletar um exercício personalizado
-@app.delete("/{exercicio_id}")
-def deletar_exercicio(exercicio_id: int, db: Session = Depends(get_db)):
-    return deletar_exercicio_personalizado(db=db, exercicio_id=exercicio_id)
+@app.get("/buscar/eventos/{municipio_id}/{usuario_id}")
+def Buscar_Eventos_Endpoint(municipio_id:int,usuario_id:int,db: Session = Depends(get_db)):
+    return buscar_eventos(municipio_id,usuario_id,db)
+
+@app.get("/atualizar/quantidades/participantes/{evento_id}")
+def Atualizar_Quantidade_Participantes_Endpoint(evento_id,db: Session = Depends(get_db)):
+    atualizar_quantidade_participantes(evento_id,db)
+
+
+@app.get("/cadastrar/usuario/evento/{evento_id}/{participante_id}")
+def Cadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
+    cadastrar_usuario_evento(evento_id,participante_id,db)
+@app.get("/descadastrar/usuario/evento/{evento_id}/{participante_id}")
+def Descadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
+    descadastrar_usuario_evento(evento_id,participante_id,db)
+
+
+@app.patch("/eventos/{evento_id}/interesse")
+def Atualizar_Interesse_Evento_Endpoint(evento_id: int,interesse: InteresseEvento,db:Session = Depends(get_db)):
+    return atualizar_interesse_evento(evento_id,interesse,db)
+
+@app.get("/lista/participantes/evento/{evento_id}")
+def  Lista_Participantes_Evento_Endpoint(evento_id:int,db:Session = Depends(get_db)):
+    return listar_participantes_evento(evento_id,db)

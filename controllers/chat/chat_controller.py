@@ -77,13 +77,12 @@ def recuperar_conversas_usuario(db: Session, remetente_id: int, destinatario_id:
 def conversas_chat(id_usuario, db: Session):
     UsuarioRemetente = aliased(Usuario)
     UsuarioDestinatario = aliased(Usuario)
-    
+
     # Subquery para obter a última mensagem trocada entre os usuários
     subquery = (
         db.query(
             Chat.id_conversa,
             func.max(Chat.id).label('ultima_mensagem_id'),
-            
         )
         .filter(or_(Chat.remetente_id == id_usuario, Chat.destinatario_id == id_usuario))
         .group_by(Chat.id_conversa)
@@ -95,8 +94,9 @@ def conversas_chat(id_usuario, db: Session):
         db.query(
             Chat,
             UsuarioRemetente.nome_usuario.label('nome_remetente'),
+            UsuarioRemetente.foto_perfil.label('foto_remetente'),
             UsuarioDestinatario.nome_usuario.label('nome_destinatario'),
-            UsuarioDestinatario.foto_perfil.label('foto_perfil'),
+            UsuarioDestinatario.foto_perfil.label('foto_destinatario'),
             UsuarioDestinatario.id.label("id_destinatario")
         )
         .join(UsuarioRemetente, Chat.remetente_id == UsuarioRemetente.id)
@@ -109,15 +109,23 @@ def conversas_chat(id_usuario, db: Session):
 
     # Converting to dictionary manually
     conversas_dict = []
-    for chat, nome_remetente, nome_destinatario, foto_perfil,id_destinatario in conversas:
+    for chat, nome_remetente, foto_remetente, nome_destinatario, foto_destinatario, id_destinatario in conversas:
         chat_dict = chat.to_dict_conversations()
-        chat_dict.update({
-            "nome_remetente": nome_remetente,
-            "nome_destinatario": nome_destinatario,
-            "foto_perfil":foto_perfil,
-            "id_usuario":id_destinatario,
-            "ultima_mensagem": chat.texto  # Assumindo que o campo de texto da mensagem é 'texto'
-        })
+        if chat.remetente_id == id_usuario:
+            # Se o id_usuario for o remetente, retorne dados do destinatário
+            chat_dict.update({
+                "nome_usuario": nome_destinatario,
+                "foto_perfil": foto_destinatario,
+                "id_usuario": id_destinatario,
+            })
+        else:
+            # Se o id_usuario for o destinatário, retorne dados do remetente
+            chat_dict.update({
+                "nome_usuario": nome_remetente,
+                "foto_perfil": foto_remetente,
+                "id_usuario": chat.remetente_id,
+            })
+        chat_dict["ultima_mensagem"] = chat.texto  # Assumindo que o campo de texto da mensagem é 'texto'
         conversas_dict.append(chat_dict)
 
     return conversas_dict

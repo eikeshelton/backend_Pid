@@ -19,7 +19,7 @@ def buscar_exercicios_banco(db: Session):
 # Função para buscar dados do exercício por nome
 def buscar_exercicios_por_nome(db: Session, nome_exercicio: str):
     exercicios = db.query(Exercicio).filter(
-        Exercicio.nome_exercicio.ilike(f"%{nome_exercicio}%")
+        Exercicio.nome.ilike(f"%{nome_exercicio}%")
     ).all()
 
     if not exercicios:

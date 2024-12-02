@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import date,datetime,time
-from typing import List, Optional
+from typing import Optional,List
+
 #classe abstrata 
 class PessoaBase(BaseModel):
     nome_usuario: Optional[str] = None
@@ -62,7 +63,7 @@ class Mensagem(BaseModel):
     id_conversa:int
 
 
-class ParceiroTreino(BaseModel):
+class ParceiroTreinoSchema(BaseModel):
     id_usuario: Optional[int] = None
     modalidade: str
     estado_codigo_ibge: int
@@ -77,7 +78,7 @@ class ParceiroTreino(BaseModel):
     datetime_registro: Optional[datetime] = None
     
 
-class ParceiroTreinoResponse(ParceiroTreino):
+class ParceiroTreinoResponse(ParceiroTreinoSchema):
     id: int
     nome_usuario: str
     foto_perfil: Optional[str] = None
@@ -142,7 +143,7 @@ class AlimentoResponse(AlimentoBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RefeicaoBase(BaseModel):
     nome: str
@@ -180,12 +181,29 @@ class BuscaAlimento(BaseModel):
     data:date
 
 class CadastrarEvento(BaseModel):
+    id:Optional[int]
     organizador_id:int
     nome:str
     descricao:Optional[str] = None
     data_inicio: date
     hora_inicio: time
     localizacao : str
+    municipio_id:int
+    quantidade_participantes: Optional[int] = 0
+
+
+class EventoResponse(BaseModel):
+    id: int
+    nome: str
+    quantidade_participantes: int
+    interesse_declarado: bool
+
+    class Config:
+        from_attributes = True
+class InteresseEvento(BaseModel):
+    participante_id: int
+    interesse_declarado: bool
+
 
 # Schema de entrada para criação de um novo treinamento
 class TreinamentoCreate(BaseModel):
@@ -194,7 +212,7 @@ class TreinamentoCreate(BaseModel):
     is_publico: Optional[bool] = False  # Para indicar se o treinamento é público
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Schema de saída para visualização dos dados do treinamento
 class Treinamento(BaseModel):
@@ -205,7 +223,7 @@ class Treinamento(BaseModel):
     is_publico: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         
 # Schema para visualização de um treinamento armazenado no banco de dados
 class TreinamentoCreate(BaseModel):
@@ -216,7 +234,7 @@ class TreinamentoCreate(BaseModel):
     exercicios: List[int] = Field(min_items=1, description="Lista de IDs de exercícios")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TreinamentoUpdate(BaseModel):
     nome: Optional[str] = None
@@ -224,7 +242,7 @@ class TreinamentoUpdate(BaseModel):
     dia_da_semana: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ExercicioBase(BaseModel):
     id: int
@@ -242,7 +260,7 @@ class ExercicioPersonalizadoBase(BaseModel):
     tempo_descanso_seg: Optional[int] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ExercicioPersonalizadoCreate(ExercicioPersonalizadoBase):
     pass  
@@ -254,4 +272,4 @@ class ExercicioPersonalizado(ExercicioPersonalizadoBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

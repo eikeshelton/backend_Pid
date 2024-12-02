@@ -9,8 +9,8 @@ class Treinamento(Base):
     id = Column(Integer, primary_key=True)
     usuario_id = Column(Integer, ForeignKey('usuario.id', ondelete='CASCADE'), nullable=False)
     nome = Column(String(100), nullable=False)
-    descricao = Optional[str] = Column(Text, default=None)
-    dia_da_semana = Optional[str] = Column(String(20), default=None)
+    descricao = Column(Text, default=None, nullable=True)
+    dia_da_semana = Column(String(20), default=None)
     is_publico = Column(Boolean, default=False)
 
     usuario = relationship('Usuario', back_populates='treinamentos')
