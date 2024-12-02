@@ -331,7 +331,6 @@ def atualizar_exercicio(exercicio_id: int, exercicio: ExercicioPersonalizadoUpda
 @app.delete("/{exercicio_id}")
 def deletar_exercicio(exercicio_id: int, db: Session = Depends(get_db)):
     return deletar_exercicio_personalizado(db=db, exercicio_id=exercicio_id)
-
 # Endpoint para criar um novo treinamento no banco de dados
 @app.post("/treinamento/{id_usuario}", response_model=Treinamento)
 def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
