@@ -283,6 +283,8 @@ def Atualizar_Quantidade_Participantes_Endpoint(evento_id,db: Session = Depends(
 @app.get("/cadastrar/usuario/evento/{evento_id}/{participante_id}")
 def Cadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
     cadastrar_usuario_evento(evento_id,participante_id,db)
+
+    
 @app.get("/descadastrar/usuario/evento/{evento_id}/{participante_id}")
 def Descadastrar_Usuario_Evento_Endpoint(evento_id:int,participante_id:int,db:Session = Depends(get_db)):
     descadastrar_usuario_evento(evento_id,participante_id,db)
@@ -301,11 +303,6 @@ def  Lista_Participantes_Evento_Endpoint(evento_id:int,db:Session = Depends(get_
 def Buscar_Eventos_Endpoint(municipio_id:int,usuario_id:int,db: Session = Depends(get_db)):
     return buscar_eventos(municipio_id,usuario_id,db)
 
-# Endpoint para criar um novo treinamento no banco de dados
-@app.post("/treinamento/{id_usuario}", response_model=Treinamento)
-def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
-    return criar_treinamento(db=db, treinamento=treinamento, id_usuario=id_usuario)
-
 # Endpoint para excluir um treinamento do banco de dados
 @app.delete("/treinamento/{treinamento_id}", response_model=Treinamento)
 def excluir_treinamento_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
@@ -315,11 +312,6 @@ def excluir_treinamento_endpoint(treinamento_id: int, db: Session = Depends(get_
 @app.get("/treinamento/banco/{treinamento_id}", response_model=Treinamento)
 def buscar_treinamento_banco_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
     return buscar_treinamento_banco(db=db, treinamento_id=treinamento_id)
-
-# Endpoint para buscar os treinamentos de um usuário
-@app.get("/treinamentos/{usuario_id}", response_model=list[Treinamento])
-def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
-    return buscar_treinamentos_por_usuario(usuario_id, db)
 
 #Endpoint pra atualizar treinamento
 @app.put("/treinamentos/{treinamento_id}", response_model=Treinamento)
