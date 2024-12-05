@@ -334,4 +334,12 @@ def deletar_exercicio(exercicio_id: int, db: Session = Depends(get_db)):
 # Endpoint para criar um novo treinamento no banco de dados
 @app.post("/treinamento/{id_usuario}", response_model=Treinamento)
 def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
+    print("Dados recebidos no endpoint:")
+    print(f"Treinamento: {treinamento}")
+    print(f"ID do Usuário: {id_usuario}")
     return criar_treinamento(db=db, treinamento=treinamento, id_usuario=id_usuario)
+
+# Endpoint para buscar os treinamentos de um usuário
+@app.get("/treinamentos/{usuario_id}")
+def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
+    return buscar_treinamentos_por_usuario(usuario_id, db)

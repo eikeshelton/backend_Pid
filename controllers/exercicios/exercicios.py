@@ -38,14 +38,14 @@ def buscar_exercicios_api():
 # Função para criar um exercício personalizado
 def criar_exercicio_personalizado(db: Session, exercicio):
     db_exercicio = ExercicioPersonalizado(
-        treinamento_id=exercicio.treinamento_id,
-        api_exercicio_id=exercicio.api_exercicio_id,
-        nome_exercicio=exercicio.nome_exercicio,
-        notas=exercicio.notas,
-        repeticoes=exercicio.repeticoes,
-        series=exercicio.series,
-        carga_kg=exercicio.carga_kg,
-        tempo_descanso_seg=exercicio.tempo_descanso_seg
+        treinamento_id = exercicio['treinamento_id'] ,
+        api_exercicio_id=exercicio['api_exercicio_id'],
+        nome_exercicio=exercicio['nome_exercicio'],
+        notas=exercicio['notas'],
+        repeticoes=exercicio['repeticoes'],
+        series=exercicio['series'],
+        carga_kg=exercicio['carga_kg'],
+        tempo_descanso_seg=exercicio['tempo_descanso_seg']
     )
     db.add(db_exercicio)
     db.commit()

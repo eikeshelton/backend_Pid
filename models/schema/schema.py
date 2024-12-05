@@ -224,14 +224,21 @@ class Treinamento(BaseModel):
 
     class Config:
         from_attributes = True
-        
+
+class ExercicioCreate(BaseModel):
+    nome: str
+    series: Optional[int]
+    carga: Optional[int]
+    nota:Optional[str]
+    repeticoes: Optional[int]
+    tempoDescanso: Optional[int] 
+    id_exercicio:int
 # Schema para visualização de um treinamento armazenado no banco de dados
 class TreinamentoCreate(BaseModel):
     nome: str
-    usuario_id: int
     descricao: Optional[str] = None
-    dia_da_semana: Optional[str] = None
-    exercicios: List[int] = Field(min_items=1, description="Lista de IDs de exercícios")
+    dia_da_semana: Optional[str]
+    exercicios: List[ExercicioCreate]
 
     class Config:
         from_attributes = True

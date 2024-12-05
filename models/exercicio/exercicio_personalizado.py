@@ -10,6 +10,7 @@ class ExercicioPersonalizado(Base):
     treinamento_id = Column(Integer, ForeignKey('treinamento.id', ondelete='CASCADE'), nullable=False)
     api_exercicio_id = Column(Integer, ForeignKey('exercicios.id'), nullable=False) 
     notas: Optional[str] = Column(Text, default=None)
+    nome_exercicio: Optional[str] = Column(Text, default=None)
     repeticoes: Optional[int] = Column(Integer, default=None)
     series: Optional[int] = Column(Integer, default=None)
     carga_kg: Optional[int] = Column(Integer, default=None)
