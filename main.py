@@ -301,6 +301,35 @@ def  Lista_Participantes_Evento_Endpoint(evento_id:int,db:Session = Depends(get_
 def Buscar_Eventos_Endpoint(municipio_id:int,usuario_id:int,db: Session = Depends(get_db)):
     return buscar_eventos(municipio_id,usuario_id,db)
 
+# Endpoint para criar um novo treinamento no banco de dados
+@app.post("/treinamento/{id_usuario}", response_model=Treinamento)
+def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
+    return criar_treinamento(db=db, treinamento=treinamento, id_usuario=id_usuario)
+
+# Endpoint para excluir um treinamento do banco de dados
+@app.delete("/treinamento/{treinamento_id}", response_model=Treinamento)
+def excluir_treinamento_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
+    return excluir_treinamento(db=db, treinamento_id=treinamento_id)
+
+# Endpoint para buscar um treinamento específico no banco de dados
+@app.get("/treinamento/banco/{treinamento_id}", response_model=Treinamento)
+def buscar_treinamento_banco_endpoint(treinamento_id: int, db: Session = Depends(get_db)):
+    return buscar_treinamento_banco(db=db, treinamento_id=treinamento_id)
+
+# Endpoint para buscar os treinamentos de um usuário
+@app.get("/treinamentos/{usuario_id}", response_model=list[Treinamento])
+def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
+    return buscar_treinamentos_por_usuario(usuario_id, db)
+
+#Endpoint pra atualizar treinamento
+@app.put("/treinamentos/{treinamento_id}", response_model=Treinamento)
+def editar_treinamento_endpoint(treinamento_id: int, treinamento: TreinamentoUpdate, db: Session = Depends(get_db)):
+    return atualizar_treinamento(db, treinamento_id, treinamento)
+
+# Endpoint para buscar todos os treinamentos no banco de dados
+@app.get("/treinamento/banco", response_model=list[Treinamento])
+def buscar_treinamentos_banco_endpoint(db: Session = Depends(get_db)):
+    return buscar_treinamentos_banco(db=db)
 
 # Endpoint para buscar um exercício específico no banco de dados
 @app.get("/busca_exercicio/{exercicio_id}", response_model=ExercicioPersonalizado)
@@ -331,6 +360,7 @@ def atualizar_exercicio(exercicio_id: int, exercicio: ExercicioPersonalizadoUpda
 @app.delete("/{exercicio_id}")
 def deletar_exercicio(exercicio_id: int, db: Session = Depends(get_db)):
     return deletar_exercicio_personalizado(db=db, exercicio_id=exercicio_id)
+
 # Endpoint para criar um novo treinamento no banco de dados
 @app.post("/treinamento/{id_usuario}", response_model=Treinamento)
 def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, db: Session = Depends(get_db)):
@@ -343,3 +373,4 @@ def criar_treinamento_endpoint(treinamento: TreinamentoCreate, id_usuario: int, 
 @app.get("/treinamentos/{usuario_id}")
 def buscar_treinamentos_endpoint(usuario_id: int, db: Session = Depends(get_db)):
     return buscar_treinamentos_por_usuario(usuario_id, db)
+
